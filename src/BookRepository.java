@@ -1,24 +1,9 @@
-//Här ska databasinteraktionen ske.
-//Ska finnas en getAllBooks-metod.
-//Returnerar en ArrayList av Books.
-
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Properties;
 
-public class BookRepository {
-    private String URL, USER, PASSWORD;
+public class BookRepository extends Repository {
 
-    public BookRepository() throws IOException {
-        Properties properties= new Properties();
-        FileInputStream input = new FileInputStream("database.properties");
-
-        properties.load(input);
-        URL = properties.getProperty("DB_URL");
-        USER = properties.getProperty("DB_USERNAME");
-        PASSWORD = properties.getProperty("DB_PASSWORD");
+    public BookRepository() {
     }
 
     public ArrayList<String> getAuthorsById(int id){

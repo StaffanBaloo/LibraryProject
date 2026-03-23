@@ -1,8 +1,3 @@
-//Menyn
-//Switch, while, scanner.
-//Ska ha ett alternativ för att visa alla böcker.
-//Kallar på BookRepository.getAllBooks()
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -21,7 +16,7 @@ public class BookController {
             System.out.println("4. Add book");
             System.out.println("5. Update book");
             System.out.println("6. Delete book");
-            System.out.println("0. Exit");
+            System.out.println("0. Back");
             int choice=Integer.parseInt(scanner.nextLine());
             switch (choice) {
                 case 1: {
@@ -49,9 +44,10 @@ public class BookController {
                     }
                     break;
                 }
-                case 0:
-                    active=false;
+                case 0: {
+                    active = false;
                     break;
+                }
 
             }
         }
