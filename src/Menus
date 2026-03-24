@@ -1,0 +1,118 @@
+Welcome to the library!
+Are you a:
+1. Member?
+2. Admin?
+(0. Exit)
+
+Member:
+Please enter your member ID number or e-mail address (0 to go back):
+
+Welcome, %Name%!
+Your membership status is %Status%.
+You have %notifications% unread notifications.
+You have %value% in outstanding fines.
+You have %loans% books borrowed currently.
+%overdueloans% of these are currently overdue.
+What do you want to do?
+1. Book menu.
+2. Loans menu.
+3. Read notifications.
+0. Back.
+
+Book menu:
+1. Display all books.
+2. Display all available books.
+3. Search books by author.
+4. Search books by title.
+5. Search books by category.
+6. Search books by keyword.
+7. Display detailed book info by ID.
+0. Back.
+
+Search:
+Please enter author|category|keyword (0 to cancel):
+
+Display by ID:
+Please enter book ID (0 to cancel):
+
+Loans menu:
+1. Show current loans.
+2. Return all books.
+3. Return one book.
+0. Back.
+
+Notifications menu:
+You have N unread notifications.
+1. List unread notifications.
+2. List older notifications.
+0. Back.
+
+Admin menu:
+Welcome, Admin! What do you want to work on?
+1. Books.
+2. Loans.
+3. Members.
+4. Authors.
+5. Routines.
+0. Back.
+
+Admin-book menu:
+1. Display all books.
+2. Display all available books.
+3. Search books by author.
+4. Search books by title.
+5. Search books by category.
+6. Search books by keyword.
+7. Display detailed book info by ID.
+8. Add book (make sure author(s) is/are added first).
+9. Modify book.
+0. Back.
+
+Admin-loan menu:
+1. Display overdue loans.
+2. Display a member's loans.
+3. Display loans of one book.
+0. Back.
+
+Admin-member menu:
+1. Display all members.
+2. Display one member and modify.
+3. Add member.
+
+Admin one-member menu:
+Member info:
+1. Change first name.
+2. Change last name.
+3. Change e-mail address.
+4. View unpaid fines.
+5. Send notification.
+0. Back.
+
+Admin member fine menu:
+This member has a total of X outstanding fines totalling Y.
+1. Display individual fines.
+2. Receive payment for all fines.
+3. Receive payment for one fine.
+4. Receive payment of particular value.
+0. Back.
+
+Admin member notifications menu:
+1. Send notification for all loans.
+2. Send notification for nearly overdue loans.
+3. Send notification for overdue loans.
+4. Send notification for fines.
+5. Send custom notification.
+0. Back.
+
+Admin authors menu:
+1. Display all authors.
+2. Display all books by author.
+3. Add author.
+4. Modify author.
+0. Back.
+
+Admin routines menu:
+1. Send notifications for all nearly overdue loans.
+2. Send notifications for all overdue loans.
+3. Send notifications for all fines.
+0. Back.
