@@ -4,12 +4,13 @@ import java.util.Scanner;
 public class UserController {
     int userId;
     UserService userService = new UserService;
+    Scanner scanner = new Scanner(System.in);
 
     public UserController(int userId) {
         this.userId = userId;
     }
 
-    public showMenu(){
+    public void showMenu(){
         boolean active = true;
         int numberUnreadNotes, numberLoans, numberOverdueLoans, choice;
         float totalFines;
