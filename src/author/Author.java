@@ -39,6 +39,16 @@ public class Author {
         this.website = website;
     }
 
+    public Author() {
+        this.id = 0;
+        this.firstName = "";
+        this.lastName = "";
+        this.nationality = "";
+        this.birthDate = LocalDate.of(1,1,1);
+        this.biography = "";
+        this.website = "";
+    }
+
     public int getId() {
         return id;
     }

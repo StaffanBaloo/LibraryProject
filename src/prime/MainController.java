@@ -1,3 +1,5 @@
+package prime;
+
 import member.*;
 import exceptions.*;
 
@@ -13,14 +15,13 @@ public class MainController {
         boolean active = true;
 
         while(active) {
-            System.out.println("======Main Meny=====");
-            System.out.println("Welcome to the library!");
-            System.out.println("Are you a:");
-            System.out.println("1. Guest?");
-            System.out.println("2. Member?");
-            System.out.println("3. Librarian?");
-            System.out.println("4. Test ANSI");
-            System.out.println("0. Exit");
+            System.out.println("======Huvudmeny=====");
+            System.out.println("Välkommen till biblioteket!");
+            System.out.println("Är du en:");
+            System.out.println("1. Gäst?");
+            System.out.println("2. Medlem?");
+            System.out.println("3. Bibliotekarie?");
+            System.out.println("0. Avsluta");
             int choice=Integer.parseInt(scanner.nextLine());
             switch (choice) {
                 case 1 -> IO.NYI();
@@ -33,12 +34,8 @@ public class MainController {
                     LibrarianController librarianController = new LibrarianController();
                     librarianController.showMenu();
                 }
-                case 4 ->{
-                    System.out.println(ANSI.bold()+ANSI.color("red") + "This should be bold red"+ANSI.reset());
-                    System.out.println(ANSI.bold() + "bold " + ANSI.noBold() + ANSI.italic() + "italic " + ANSI.noItalic() + ANSI.underline() + "underline " + ANSI.noUnderline() + "default");
-                    System.out.println(ANSI.color("bright_yellow") + "bright yellow " + ANSI.color("blue") + "blue " + ANSI.color("orange") + "orange");
-                }
                 case 0 -> active=false;
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
@@ -49,30 +46,29 @@ public class MainController {
         MemberService memberService = new MemberService();
         EmailValidator emailValidator = EmailValidator.getInstance();
         while(active){
-            System.out.println("Please enter your member ID or your e-mail address:");
+            System.out.println("Vänligen ange ditt medlems-ID eller din e-postadress:");
             String input=scanner.nextLine().trim();
 
             if (IO.isNumeric (input)){
                 try {
                     user = memberService.getById(Integer.parseInt(input));
                     active = false;
+                    Main.login(user);
                 } catch (MemberNotFoundException e) {
-                    System.out.println("Member " + input + " could not be found.");
+                    System.out.println("Kunde inte hitta medlem " + input + ".");
                 }
             } else if (emailValidator.isValid(input)) {
                 try {
                     user = memberService.getByEmail(input);
                     active=false;
+                    Main.login(user);
                 } catch (MemberNotFoundException e) {
-                    System.out.println("Could not find any member with the email "+input + ".");
+                    System.out.println("Kunde inte hitta någon medlem med e-postadress "+input + ".");
                 }
 
             } else {
-                System.out.println("Invalid ID or e-mail address.");
+                System.out.println("Ogiltig ID eller e-postadress.");
             }
-        }
-        if(!(null == user)){
-            Main.login(user);
         }
     }
 }

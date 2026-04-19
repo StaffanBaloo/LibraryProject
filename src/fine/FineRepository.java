@@ -1,5 +1,6 @@
 package fine;
-import Repository;
+import prime.DateConverter;
+import prime.Repository;
 import book.Book;
 import exceptions.*;
 import loan.Loan;
@@ -16,8 +17,7 @@ public class FineRepository extends Repository {
              PreparedStatement stmt = conn.prepareStatement("""
                 INSERT INTO fines
                     (loan_id, amount, issued_date, status)
-                VALUES (?, ?, ?, ?)
-                """)) {
+                VALUES (?, ?, ?, ?)""", Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, fine.getLoan().getId());
             stmt.setInt(2, fine.getAmount());
             stmt.setDate(3, Date.valueOf(LocalDate.now()));
@@ -79,7 +79,7 @@ public class FineRepository extends Repository {
     }
 
     public Fine getFineById (int id){
-        Fine fine;
+        Fine fine = new Fine();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
             SELECT *, l.*, b.*, m.*
@@ -90,7 +90,7 @@ public class FineRepository extends Repository {
             WHERE f.id = ?;""")) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
-            if (rs.first()){
+            if (rs.next()){
                 fine = mapRow(rs);
             }
         } catch (SQLException e) {
@@ -151,7 +151,7 @@ public class FineRepository extends Repository {
                 """)) {
             stmt.setInt(1,memberId);
             ResultSet rs = stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 return rs.getInt("total_fines");
             } else {
                 return 0;
@@ -171,7 +171,7 @@ public class FineRepository extends Repository {
             """)) {
             stmt.setInt(1,fineId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
+            if (rs.next()) {
                 if(rs.getInt("number")>0) {
                     exists = true;
                 }
@@ -198,13 +198,13 @@ public class FineRepository extends Repository {
                                     rs.getString("m.email"),
                                     rs.getString("m.membership_type"),
                                     rs.getString("m.status"),
-                                    rs.getDate("m.membership_date").toLocalDate()),
-                            rs.getDate("l.loan_date").toLocalDate(),
-                            rs.getDate("l.due_date").toLocalDate(),
-                            rs.getDate("l.return_date").toLocalDate()),
+                                    DateConverter.toLocalDate(rs.getDate("m.membership_date"))),
+                            DateConverter.toLocalDate(rs.getDate("l.loan_date")),
+                            DateConverter.toLocalDate(rs.getDate("l.due_date")),
+                            DateConverter.toLocalDate(rs.getDate("l.return_date"))),
                     rs.getInt("amount"),
-                    rs.getDate("issued_date").toLocalDate(),
-                    rs.getDate("paid_date").toLocalDate(),
+                    DateConverter.toLocalDate(rs.getDate("issued_date")),
+                    DateConverter.toLocalDate(rs.getDate("paid_date")),
                     rs.getString("status"));
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());

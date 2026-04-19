@@ -26,6 +26,16 @@ public class Member {
         this.membershipDate=LocalDate.now();
     }
 
+    public Member() {
+        this.memberId = 0;
+        this.firstName = "";
+        this.lastName = "";
+        this.email = "";
+        this.membershipType = "";
+        this.status = "";
+        this.membershipDate = LocalDate.of(1,1,1);
+    }
+
     @Override
     public String toString() {
         String fullMember = "";

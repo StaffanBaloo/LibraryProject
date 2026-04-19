@@ -68,6 +68,20 @@ public class Book {
         this.categories = new ArrayList<>();
     }
 
+    public Book() {
+        this.bookId = 0;
+        this.title = "";
+        this.isbn = "";
+        this.yearPublished = 0;
+        this.totalCopies = 0;
+        this.availableCopies = 0;
+        this.authors = new ArrayList<Author>();
+        this.categories = new ArrayList<Category>();
+        this.summary = "";
+        this.pageCount = 0;
+        this.language = "";
+    }
+
     @Override
     public String toString() {
         String fullBook = "";

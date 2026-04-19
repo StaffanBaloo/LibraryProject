@@ -1,6 +1,7 @@
 package loan;
 
-import Repository;
+import prime.Repository;
+import prime.DateConverter;
 import book.Book;
 import exceptions.LoanReturnException;
 import member.Member;
@@ -16,7 +17,7 @@ public class LoanRepository extends Repository {
              PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) AS number FROM loans WHERE member_id=? AND return_date IS NULL")){
             stmt.setInt(1, member.getMemberId());
             ResultSet rs = stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 return rs.getInt("number");
             }
         } catch (SQLException e) {
@@ -36,7 +37,7 @@ public class LoanRepository extends Repository {
                   AND due_date<CURRENT_DATE()""")) {
             stmt.setInt(1, member.getMemberId());
             ResultSet rs = stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 return rs.getInt("number");
             }
         } catch (SQLException e) {
@@ -131,7 +132,7 @@ public class LoanRepository extends Repository {
                 WHERE l.id = ?""")) {
             stmt.setInt(1, loanId);
             ResultSet rs = stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 return mapRow(rs);
             }
         } catch (SQLException e) {
@@ -214,7 +215,7 @@ public class LoanRepository extends Repository {
                 WHERE book_id = ?;""")) {
             stmt.setInt(1, book.getBookId());
             ResultSet rs = stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 number = rs.getInt("number");
             }
         } catch (SQLException e) {
@@ -248,7 +249,7 @@ public class LoanRepository extends Repository {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
         PreparedStatement insert = conn.prepareStatement("""
             INSERT INTO loans (book_id, member_id, loan_date, due_date)
-            VALUES (?, ?, ?, ?);""");
+            VALUES (?, ?, ?, ?);""", Statement.RETURN_GENERATED_KEYS);
         PreparedStatement update = conn.prepareStatement("""
             UPDATE books
             SET available_copies =?
@@ -260,11 +261,12 @@ public class LoanRepository extends Repository {
             insert.setDate(4, Date.valueOf(loan.getDueDate()));
             update.setInt(1, loan.getBook().getAvailableCopies()-1);
             update.setInt(2, loan.getBook().getBookId());
-            ResultSet insertSet = insert.getGeneratedKeys();
+
             int insertRowCount = insert.executeUpdate();
             if(insertRowCount>0){
+                ResultSet insertSet = insert.getGeneratedKeys();
                 if(insertSet.next()){
-                    newLoanId=insertSet.getInt("id");
+                    newLoanId=insertSet.getInt(1);
                     loan.setId(newLoanId);
                 }
                 int updateRowCount = update.executeUpdate();
@@ -316,11 +318,11 @@ public class LoanRepository extends Repository {
                             rs.getString("m.last_name"),
                             rs.getString("m.email"),
                             rs.getString("m.membership_type"),
-                            rs.getString("m.membership_status"),
-                            rs.getDate("m.membership_date").toLocalDate()),
-                    rs.getDate("loan_date").toLocalDate(),
-                    rs.getDate("due_date").toLocalDate(),
-                    rs.getDate("return_date").toLocalDate());
+                            rs.getString("m.status"),
+                            DateConverter.toLocalDate(rs.getDate("m.membership_date"))),
+                    DateConverter.toLocalDate(rs.getDate("loan_date")),
+                    DateConverter.toLocalDate(rs.getDate("due_date")),
+                    DateConverter.toLocalDate(rs.getDate("return_date")));
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());
         }

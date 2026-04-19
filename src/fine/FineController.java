@@ -1,7 +1,7 @@
 package fine;
 
-import IO;
-import Main;
+import prime.IO;
+import prime.Main;
 import member.Member;
 
 import java.util.ArrayList;
@@ -15,16 +15,16 @@ public class FineController {
         boolean active = true;
         while(active){
             System.out.println("""
-                    What do you want to do?
-                    1. View all my unpaid fines.
-                    2. Pay a fine.
-                    0. Go back.""");
+                    Bötesmeny:
+                    1. Se alla mina obetalda böter.
+                    2. Betala en bot.
+                    0. Gå tillbaka.""");
             int choice = IO.inputNumber();
             switch (choice) {
                 case 1 -> showUnpaidFines(Main.loggedInUser);
                 case 2 -> payFine(Main.loggedInUser);
                 case 0 -> active = false;
-                default -> System.out.println("Please enter a valid choice.");
+                default -> System.out.println("Vänligen gör ett giltigt val.");
             }
         }
     }
@@ -32,9 +32,9 @@ public class FineController {
     public void showUnpaidFines(Member member){
         ArrayList<Fine> fines = fineService.getAllUnpaidFinesForMember(member);
         if(fines.isEmpty()) {
-            System.out.println("You have no unpaid fines.");
+            System.out.println("Du har inga obetalda böter.");
         } else {
-            System.out.println("ID | Amount | Title");
+            System.out.println("ID | Belopp | Titel");
             for (Fine fine : fines) {
                 System.out.println(fine.getId() + " | " + fine.getAmount() + " kr | " + fine.getLoan().getBook().getTitle());
             }
@@ -44,7 +44,7 @@ public class FineController {
     public void payFine(Member member) {
         boolean active = true;
         while(active) {
-            System.out.println("Please enter fine ID (or 0 to go back):");
+            System.out.println("Vänligen ange bot-ID (eller 0 för att gå tillbaka):");
             int id = IO.inputNumber();
             if(id==0) {
                 active = false;
@@ -54,10 +54,10 @@ public class FineController {
                     fineService.payFine(fine);
                     active = false;
                 } else {
-                    System.out.println("That fine does not belong to one of your loans.");
+                    System.out.println("Den boten hör inte till ett av dina lån.");
                 }
             } else {
-                System.out.println("There is no fine with ID "+id+".");
+                System.out.println("Det finns ingen bot med ID "+id+".");
             }
         }
     }

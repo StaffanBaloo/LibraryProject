@@ -3,7 +3,7 @@ package book;
 import java.sql.*;
 import java.util.ArrayList;
 
-import Repository;
+import prime.Repository;
 import author.Author;
 import category.Category;
 
@@ -20,7 +20,7 @@ public class BookRepository extends Repository {
 
             // executeQuery() skickar en SELECT-fråga och returnerar ett ResultSet
             ResultSet rs = stmt.executeQuery("""
-                SELECT b.id AS id, title, isbn, year_published, total_copies, available_copies, bd.summary, bd.page_count, bd.language
+                SELECT b.*, bd.*
                     FROM books b
                     JOIN book_descriptions bd ON b.id = bd.book_id
                     WHERE b.total_copies>0;
@@ -46,7 +46,7 @@ public class BookRepository extends Repository {
 
             // executeQuery() skickar en SELECT-fråga och returnerar ett ResultSet
             ResultSet rs = stmt.executeQuery("""
-                SELECT b.id AS id, title, isbn, year_published, total_copies, available_copies, bd.summary, bd.page_count, bd.language
+                SELECT b.*, bd.*
                     FROM books b
                     JOIN book_descriptions bd ON b.id = bd.book_id;
             """);
@@ -67,7 +67,7 @@ public class BookRepository extends Repository {
         ArrayList<Book> books = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
         PreparedStatement stmt = conn.prepareStatement("""
-                SELECT b.id AS id, title, year_published, available_copies, bd.summary, bd.page_count, bd.language
+                SELECT b.*, bd.*
                     FROM books b
                     JOIN book_descriptions bd ON b.id = bd.book_id
                     WHERE title LIKE ?;
@@ -87,7 +87,7 @@ public class BookRepository extends Repository {
         ArrayList<Book> books = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
-                SELECT b.id AS id, title, year_published, available_copies, bd.summary, bd.page_count, bd.language
+                SELECT b.*, bd.*
                     FROM books b
                     JOIN book_descriptions bd ON b.id = bd.book_id
                     JOIN book_authors ba ON b.id = ba.book_id
@@ -108,7 +108,7 @@ public class BookRepository extends Repository {
         ArrayList<Book> books = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
-                SELECT b.id AS id, title, year_published, available_copies, bd.summary, bd.page_count, bd.language
+                SELECT b.*, bd.*
                     FROM books b
                     JOIN book_descriptions bd ON b.id = bd.book_id
                     JOIN book_authors ba ON b.id = ba.book_id
@@ -131,7 +131,7 @@ public class BookRepository extends Repository {
         ArrayList<Book> books = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
-                SELECT b.id AS id, title, year_published, available_copies, bd.summary, bd.page_count, bd.language
+                SELECT b.*, bd.*
                     FROM books b
                     JOIN book_descriptions bd ON b.id = bd.book_id
                     JOIN book_categories bc ON b.id = bc.book_id
@@ -152,7 +152,7 @@ public class BookRepository extends Repository {
         ArrayList<Book> books = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
-                SELECT b.id AS id, title, year_published, available_copies, bd.summary, bd.page_count, bd.language
+                SELECT b.*, bd.*
                     FROM books b
                     JOIN book_descriptions bd ON b.id = bd.book_id
                     JOIN book_categories bc ON b.id = bc.book_id
@@ -174,7 +174,7 @@ public class BookRepository extends Repository {
         ArrayList<Book> books = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
-                SELECT b.id AS id, title, year_published, available_copies, bd.summary, bd.page_count, bd.language
+                SELECT b.*, bd.*
                     FROM books b
                     JOIN book_descriptions bd ON b.id = bd.book_id
                     WHERE bd.summary LIKE ?;
@@ -193,12 +193,12 @@ public class BookRepository extends Repository {
     public Book getBookById(int bookId) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
         PreparedStatement stmt = conn.prepareStatement("""
-            SELECT *, bd.* FROM books b
+            SELECT b.*, bd.* FROM books b
             JOIN book_descriptions bd on bd.book_id = b.id
-            WHERE id = ?""")) {
+            WHERE b.id = ?""")) {
             stmt.setInt(1, bookId);
             ResultSet rs = stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 return mapRow(rs);
             }
             else {
@@ -213,13 +213,13 @@ public class BookRepository extends Repository {
     public Book getBookByLoanId(int loanId) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
-            SELECT *, bd.* FROM books b
+            SELECT b.*, bd.* FROM books b
             JOIN book_descriptions bd on bd.book_id = b.id
             JOIN loans l ON l.book_id = b.id
             WHERE l.id = ?""")) {
             stmt.setInt(1, loanId);
             ResultSet rs = stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 return mapRow(rs);
             }
             else {
@@ -240,7 +240,7 @@ public class BookRepository extends Repository {
             """)) {
             stmt.setInt(1,bookId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
+            if (rs.next()) {
                 if(rs.getInt("number")>0) {
                     exists = true;
                 }
@@ -353,7 +353,7 @@ public class BookRepository extends Repository {
              PreparedStatement booksInsert = conn.prepareStatement("""
                 INSERT INTO books
                     (title, isbn, year_published, total_copies, available_copies)
-                    VALUES (?, ?, ?, ?, ?);""");
+                    VALUES (?, ?, ?, ?, ?);""", Statement.RETURN_GENERATED_KEYS);
              PreparedStatement descriptionInsert = conn.prepareStatement("""
                 INSERT INTO book_descriptions
                     (book_id, summary, language, page_count)
@@ -373,11 +373,11 @@ public class BookRepository extends Repository {
                 booksInsert.setInt(3, book.getYearPublished());
                 booksInsert.setInt(4, book.getTotalCopies());
                 booksInsert.setInt(5, book.getAvailableCopies());
-                ResultSet insertSet = booksInsert.getGeneratedKeys();
                 int insertRowCount = booksInsert.executeUpdate();
+                ResultSet insertSet = booksInsert.getGeneratedKeys();
                 if (insertRowCount > 0) {
                     if (insertSet.next()) {
-                        newBookId = insertSet.getInt("id");
+                        newBookId = insertSet.getInt(1);
                         book.setBookId(newBookId);
                     }
                     descriptionInsert.setInt(1, newBookId);
@@ -410,14 +410,14 @@ public class BookRepository extends Repository {
 
     private Book mapRow(ResultSet rs) {
         try {
-            return new Book(rs.getInt("id"),
-                    rs.getString("title"),
-                    rs.getString("isbn"),
-                    rs.getInt("year_published"),
-                    rs.getInt("total_copies"),
-                    rs.getInt("available_copies"),
+            return new Book(rs.getInt("b.id"),
+                    rs.getString("b.title"),
+                    rs.getString("b.isbn"),
+                    rs.getInt("b.year_published"),
+                    rs.getInt("b.total_copies"),
+                    rs.getInt("b.available_copies"),
                     rs.getString("bd.summary"),
-                    rs.getInt("bd.pagecount"),
+                    rs.getInt("bd.page_count"),
                     rs.getString("bd.language"));
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());

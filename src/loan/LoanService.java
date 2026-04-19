@@ -5,8 +5,8 @@ import exceptions.LoanRenewException;
 import exceptions.LoanReturnException;
 import fine.FineService;
 import member.Member;
-import Rules;
-import Main;
+import prime.Rules;
+import prime.Main;
 
 import java.time.DayOfWeek;
 import java.time.DayOfWeek.*;
@@ -113,8 +113,8 @@ public class LoanService {
     }
 
     public Loan createLoan(Book book, Member member) {
-        Loan loan;
-        if(member.getStatus()=="active") {
+        Loan loan = new Loan();
+        if(member.getStatus().equals("active")) {
             int copies = book.getAvailableCopies();
             if (copies>0) {
                 loan = new Loan (book, member, LocalDate.now(), newDueDate());

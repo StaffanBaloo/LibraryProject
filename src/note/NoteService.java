@@ -1,12 +1,9 @@
 package note;
 
 import loan.Loan;
-import loan.LoanRepository;
 import member.Member;
-import member.MemberRepository;
-
 import java.util.ArrayList;
-import java.util.stream.Collectors;
+
 
 public class NoteService {
     NoteRepository noteRepository = new NoteRepository();

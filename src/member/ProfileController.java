@@ -1,5 +1,5 @@
 package member;
-import Main;
+import prime.Main;
 import fine.FineController;
 import fine.FineService;
 import loan.LoanService;
@@ -8,10 +8,7 @@ import note.NoteService;
 
 import java.util.Scanner;
 
-public class ProfileController () {
-    NoteService noteService = new NoteService();
-    FineService fineService = new FineService();
-    LoanService loanService = new LoanService();
+public class ProfileController {
     Scanner scanner = new Scanner(System.in);
 
 
@@ -21,42 +18,16 @@ public class ProfileController () {
 
     public void showMenu(){
         boolean active = true;
-        int numberUnreadNotes, numberLoans, numberOverdueLoans, choice;
-        int totalFines;
+        int choice;
 
         while (active){
-            System.out.println("Welcome, " + Main.loggedInUser.getFirstName() + "!");
-            System.out.println("Your membership status is: " + Main.loggedInUser.getStatus() + ".");
 
-            numberUnreadNotes = noteService.getNumberUnreadNotesByMember(Main.loggedInUser);
-            if (numberUnreadNotes > 0) {
-                System.out.println("You have " + numberUnreadNotes + " unread notifications.");
-            } else {
-                System.out.println("You have no unread notifications.");
-            }
-
-            totalFines = fineService.getUnpaidFinesTotalByMemberId(Main.loggedInUser.getMemberId());
-            if (totalFines > 0f) {
-                System.out.println("You have " + totalFines + " in unpaid fines.");
-            }
-
-            numberLoans = loanService.getNumberOfCurrentLoansByMember(Main.loggedInUser.getMemberId());
-            numberOverdueLoans = loanService.getNumberOfOverdueLoansByMember(Main.loggedInUser.getMemberId());
-            if(numberLoans>0){
-                if(numberOverdueLoans>0) {
-                    System.out.println("You have " + numberLoans + " loans currently, of which " + numberOverdueLoans + " are overdue.");
-                } else {
-                    System.out.println("You have " + numberLoans + " loans currently.");
-                }
-            } else {
-                System.out.println("You do not currently have any loans.");
-            }
             System.out.println("""
-                    What do you want to do?
-                    1. Notifications menu.
-                    2. Fines menu.
-                    3. Membership menu.
-                    0. Go back.""");
+                    Vad vill du hantera?
+                    1. Meddelanden.
+                    2. Böter.
+                    3. Medlemsskap.
+                    0. Gå tillbaka.""");
             choice=Integer.parseInt(scanner.nextLine());
             switch (choice) {
                 case 1 -> {
@@ -72,6 +43,7 @@ public class ProfileController () {
                     memberController.showMenu();
                 }
                 case 0 -> active = false;
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
 
         }

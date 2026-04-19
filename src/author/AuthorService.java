@@ -19,20 +19,17 @@ public class AuthorService {
 
     public ArrayList<AuthorListDTO> getAllAuthorListDTOs(){
         ArrayList<Author> authors = authorRepository.getAllAuthors();
-        ArrayList<AuthorListDTO> authorListDTOS = AuthorMapper.mapToListDTOs(authors);
-        return authorListDTOS;
+        return AuthorMapper.mapToListDTOs(authors);
     }
 
     public ArrayList<AuthorListDTO> getAuthorListDTOsByPartialName(String name) {
         ArrayList<Author> authors = authorRepository.getAuthorsByPartialName(name);
-        ArrayList<AuthorListDTO> authorListDTOS = AuthorMapper.mapToListDTOs(authors);
-        return authorListDTOS;
+        return AuthorMapper.mapToListDTOs(authors);
     }
 
     public ArrayList<AuthorListDTO> getAuthorListDTOsByPartialNationality(String name) {
         ArrayList<Author> authors = authorRepository.getAuthorsByPartialNationality(name);
-        ArrayList<AuthorListDTO> authorListDTOS = AuthorMapper.mapToListDTOs(authors);
-        return authorListDTOS;
+        return AuthorMapper.mapToListDTOs(authors);
     }
 
     public ArrayList<BookListDTO> getBooksByAuthorId(int authorId) {

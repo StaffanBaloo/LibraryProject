@@ -2,9 +2,9 @@ package loan;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import Main;
-import IO;
-import ANSI;
+import prime.Main;
+import prime.IO;
+import prime.ANSI;
 import exceptions.*;
 import member.Member;
 
@@ -19,13 +19,13 @@ public class LoanController {
         boolean active = true;
         while(active) {
             System.out.println("""
-                    Loans menu:
-                    1. Show current loans.
-                    2. Return all books.
-                    3. Return one book.
-                    4. Renew all loans.
-                    5. Renew one loan.
-                    0. Back.""");
+                    Lånemeny:
+                    1. Visa nuvarande lån.
+                    2. Återlämna alla böcker.
+                    3. Återlämna en bok.
+                    4. Förnya alla lån.
+                    5. Förnya ett lån.
+                    0. Gå tillbaka.""");
             int choice=IO.inputNumber();
             switch (choice){
                 case 1 -> showCurrentLoans(Main.loggedInUser);
@@ -34,6 +34,7 @@ public class LoanController {
                 case 4 -> renewAllLoans(Main.loggedInUser);
                 case 5 -> renewLoan(Main.loggedInUser);
                 case 0 -> active = false;
+                default -> System.out.println("Vänligen gör ett giltigt val.");
             }
         }
     }
@@ -42,37 +43,37 @@ public class LoanController {
         boolean active = true;
         while(active) {
             System.out.println("""
-                    Loans menu:
-                    1. Show all current loans.
-                    2. Show all overdue loans.
-                    3. Year top 10.
-                    0. Back.""");
+                    Lånemeny:
+                    1. Visa alla nuvarande lån.
+                    2. Visa alla förfallna lån.
+                    3. Årets topp 10.
+                    0. Gå tillbaka.""");
             int choice = IO.inputNumber();
             switch (choice) {
                 case 1 -> showAllCurrentLoans();
                 case 2 -> showAllOverdueLoans();
                 case 3 -> showTopList(10, LocalDate.now().minusYears(1), LocalDate.now());
                 case 0 -> active =false;
-                default -> System.out.println("Please choose a valid option.");
+                default -> System.out.println("Vänligen gör ett giltigt val.");
             }
         }
     }
 
     public void showCurrentLoans(Member member){
         if (loanService.getNumberOfCurrentLoansByMember(member) >0) {
-            System.out.println("Your current loans are:");
+            System.out.println("Dina nuvarande lån är:");
             ArrayList<Loan> loans = loanService.getCurrentLoansByMember(member);
             for (Loan loan : loans) {
                 System.out.println(loan.toString());
             }
         }else {
-            System.out.println("You do not have any current loans.");
+            System.out.println("Du har inga nuvarande lån.");
         }
     }
 
     public void showAllCurrentLoans(){
         ArrayList<Loan> loans = loanService.getAllCurrentLoans();
-        System.out.println("ID | Title | Loan date | Due date");
+        System.out.println("ID | Titel | Lånedatum | Förfallodatum");
         for(Loan loan : loans){
             if(loan.isOverdue()){
                 System.out.println(ANSI.color("bright_red") + loan.getId() + " | " + loan.getBook().getTitle() + " | " + loan.getLoanDate() + " | " + loan.getDueDate() + ANSI.reset());
@@ -84,7 +85,7 @@ public class LoanController {
 
     public void showAllOverdueLoans(){
         ArrayList<Loan> loans = loanService.getAllOverdueLoans();
-        System.out.println("ID | Title | M.ID | Member name | Loan date | Due date");
+        System.out.println("ID | Titel | M.ID | Medlemsnamn | Lånedatum | Förfallodatum");
         for(Loan loan : loans){
             System.out.println(loan.getId() + " | " + loan.getBook().getTitle() + " | " + loan.getMember().getMemberId() + " | " + loan.getMember().getFullName() + loan.getLoanDate() + " | " + loan.getDueDate());
         }
@@ -94,9 +95,9 @@ public class LoanController {
         ArrayList<String> toptitles = loanService.topList(length, start, end);
         int counter = 0;
         if(toptitles.isEmpty()){
-            System.out.println("There are no loans in that interval.");
+            System.out.println("Det finns inga lån i intervallet.");
         } else {
-            System.out.println("Pos. | Title");
+            System.out.println("Nr | Titel");
             for (String title : toptitles) {
                 counter++;
                 System.out.println(counter + " | " + title);
@@ -117,44 +118,44 @@ public class LoanController {
                         totalFees+=newFee;
                     }
                 }  catch (LoanRenewException e) {
-                    System.out.println("Could not return loan "+loan.getId()+".");
+                    System.out.println("Kunde inte åtelämna lån "+loan.getId()+".");
                     System.out.println(e.getMessage());
                 }
 
             }
             int loansRemaining = loanService.getNumberOfCurrentLoansByMember(member);
             if(loansRemaining==0){
-                System.out.println("You have returned all your loans.");
+                System.out.println("Du har återlämnat alla dina lån.");
             } else {
-                System.out.println("You have returned " + returnCounter + " loans.");
+                System.out.println("Du har återlämnat " + returnCounter + " lån.");
             }
 
             if (totalFees > 0) {
-                System.out.println("You have incurred new fees of " + totalFees + " kr.");
+                System.out.println("Du har fått nya böter på " + totalFees + " kr.");
             }
         }
         else {
-            System.out.println("You do not have any loans to return.");
+            System.out.println("Du har inga lån att återlämna.");
         }
     }
 
     void returnLoan(Member member){
         if (loanService.getNumberOfCurrentLoansByMember(member) >0) {
-            System.out.println("Which loan do you wish to return?");
+            System.out.println("Vilket lån vill du återlämna?");
             int loanId = IO.inputNumber();
             try {
                 Loan loan = loanService.getLoanById(loanId);
                 int newFee = loanService.returnLoan(loan);
-                System.out.println("You have returned " + loan.getBook().getTitle() + ".");
+                System.out.println("Du har återlämnat " + loan.getBook().getTitle() + ".");
                 if(newFee>0){
-                    System.out.println("You have incurred a new fee of " + newFee + " kr.");
+                    System.out.println("Du har gått en ny bot på " + newFee + " kr.");
                 }
             } catch (LoanReturnException e) {
-                System.out.println("Could not return that book.");
+                System.out.println("Kunde inte återlämna den boken.");
                 System.out.println(e.getMessage());
             }
         } else {
-            System.out.println("You do not have any loans to return.");
+            System.out.println("Du har inga lån att återlämna.");
         }
     }
 
@@ -166,31 +167,31 @@ public class LoanController {
                     loanService.renewLoan(loan);
                 }
                 catch (LoanRenewException e){
-                    System.out.println("Could not renew loan " + loan.getId() + " of " + loan.getBook().getTitle() + ".");
+                    System.out.println("Kunde inte förnya lån " + loan.getId() + " av " + loan.getBook().getTitle() + ".");
                     System.out.println(e.getMessage());
                 }
             }
             showCurrentLoans(member);
         } else {
-            System.out.println("You do not have any loans to renew.");
+            System.out.println("Du har inga lån att förnya.");
         }
     }
 
     void renewLoan(Member member){
         if (loanService.getNumberOfCurrentLoansByMember(member) >0) {
-            System.out.println("Which loan do you wish to renew?");
+            System.out.println("Vilket lån vill du förnya?");
             int loanId = IO.inputNumber();
             try {
                 Loan loan = loanService.getLoanById(loanId);
                 loanService.renewLoan(loan);
-                System.out.println("You have renewed your loan of " + loan.getBook().getTitle() + ".");
-                System.out.println("The new due date is " + loanService.getLoanById(loanId).getDueDate() +".");
+                System.out.println("Du har förnyat ditt lån av " + loan.getBook().getTitle() + ".");
+                System.out.println("Det nya förfallodatumet är " + loanService.getLoanById(loanId).getDueDate() +".");
             } catch (LoanRenewException e) {
-                System.out.println("Could not renew that loan.");
+                System.out.println("Kunde inte förnya det lånet.");
                 System.out.println(e.getMessage());
             }
         } else {
-            System.out.println("You do not have any loans to renew.");
+            System.out.println("Du har inga lån att förnya.");
         }
     }
 }

@@ -1,6 +1,7 @@
 package book;
 
 import java.util.ArrayList;
+import java.lang.StringBuilder;
 
 public class BookListDTO {
 
@@ -49,19 +50,20 @@ public class BookListDTO {
     }
 
     public String authors(){
-        String tempAuthors="";
+        StringBuilder tempAuthors = new StringBuilder();
+
         for (int i = 0; i<authorList.size(); i++) {
             if (i==0) {
-                tempAuthors+=authorList.get(i);
+                tempAuthors.append(authorList.get(i));
             }
             else if(i==authorList.size()-1) {
-                tempAuthors += " and " + authorList.get(i);
+                tempAuthors.append(" and ").append(authorList.get(i));
             }
             else {
-                tempAuthors += ", " +authorList.get(i);
+                tempAuthors.append(", ").append(authorList.get(i));
             }
         }
-        return tempAuthors;
+        return tempAuthors.toString();
     }
 
     @Override

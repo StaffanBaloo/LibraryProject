@@ -42,6 +42,15 @@ public class Loan {
         this.returnDate = returnDate;
     }
 
+    public Loan() {
+        this.id = 0;
+        this.book = new Book();
+        this.member = new Member();
+        this.loanDate = LocalDate.of(1,1,1);
+        this.dueDate = LocalDate.of(1,1,1);
+        this.returnDate = LocalDate.of(1,1,1);
+    }
+
     public int getId() {
         return id;
     }

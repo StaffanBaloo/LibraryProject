@@ -1,6 +1,6 @@
 package author;
 
-import IO;
+import prime.IO;
 import book.BookListDTO;
 import exceptions.*;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -23,17 +23,17 @@ public class AuthorController {
 
         while (active) {
             System.out.println("""
-                    Author menu
-                    Do you want to:
-                    1. Add an author?
-                    2. Show all authors?
-                    2. Search for author by name?
-                    3. Search for author by nationality?
-                    4. View author information?
-                    5. Find books by an author?
-                    6. Edit an author?
-                    7. Remove an author?
-                    0. Return?""");
+                    Författarmeny
+                    Vad önskas?
+                    1. Lägg till en författare.
+                    2. Visa alla författare.
+                    3. Sök författare med namn.
+                    4. Sök författare med nationalitet.
+                    5. Visa författarinformation.
+                    6. Hitta böcker av en författare.
+                    7. Redigera en författare.
+                    8. Ta bort en författare.
+                    0. Gå tillbaka.""");
             int choice = IO.inputNumber();
             switch (choice) {
                 case 1 -> addAuthor();
@@ -45,7 +45,7 @@ public class AuthorController {
                 case 7 -> editAuthor();
                 case 8 -> deleteAuthor();
                 case 0 -> active = false;
-                default -> System.out.println("Please choose a valid option");
+                default -> System.out.println("Vänligen gör ett giltigt val.");
             }
         }
     }
@@ -60,36 +60,36 @@ public class AuthorController {
         Author author = new Author(firstName, lastName, nationality, birthdate, biography, website);
         try {
             authorService.addAuthor(author);
-            System.out.println("Author "+author.getFullName()+" created.");
+            System.out.println("Författare "+author.getFullName()+" skapad med ID " + author.getId());
         } catch (CantCreateAuthorException e) {
-            System.out.println("Could not create author "+author.getFullName()+".");
+            System.out.println("Kunde inte skapa författare "+author.getFullName()+".");
         }
     }
 
     public void editAuthor(){
         boolean active = true;
         while(active){
-            System.out.println("Please enter author ID (0 to go back):");
+            System.out.println("Vänligen ange författar-ID (0 för att gå tillbaka):");
             int id = IO.inputNumber();
             if(id==0){
                 active = false;
             } else if(id<1){
-                System.out.println("ID has to be a positive number.");
+                System.out.println("ID måste vara ett positivt heltal.");
             } else if(!authorService.exists(id)) {
-                System.out.println("No author with that ID exists.");
+                System.out.println("Det finns ingen författare med det ID:t.");
             } else {
                 Author author = authorService.getAuthorById(id);
                 boolean active2 = true;
                 while(active2) {
-                    System.out.println("What information do you want to edit?");
-                    System.out.println("1. First name: " + author.getFirstName());
-                    System.out.println("2. Last name: " + author.getLastName());
-                    System.out.println("3. Nationality: " + author.getNationality());
-                    System.out.println("4. Birthdate: " + author.getBirthDate());
-                    System.out.println("5. Biography: " + author.getBiography());
-                    System.out.println("6. Website: " + author.getWebsite());
-                    System.out.println("9. Exit and save.");
-                    System.out.println("0. Exit without saving.");
+                    System.out.println("Vilken information vill du redigera?");
+                    System.out.println("1. Förnamn: " + author.getFirstName());
+                    System.out.println("2. Efternamn: " + author.getLastName());
+                    System.out.println("3. Nationalitet: " + author.getNationality());
+                    System.out.println("4. Födelsedatum: " + author.getBirthDate());
+                    System.out.println("5. Biografi: " + author.getBiography());
+                    System.out.println("6. Webbsida: " + author.getWebsite());
+                    System.out.println("9. Spara och gå tillbaka.");
+                    System.out.println("0. Gå tillbaka utan att spara.");
                     int choice = IO.inputNumber();
                     switch (choice){
                         case 1 -> author.setFirstName(askForFirstName());
@@ -103,7 +103,7 @@ public class AuthorController {
                                 authorService.save(author);
                                 active2 = false;
                                 active = false;
-                                System.out.println("Author " + author.getFullName() + " saved.");
+                                System.out.println("Sparat författare " + author.getFullName() + ".");
                             } catch (CantSaveAuthorException e) {
                                 System.out.println(e.getMessage());
                             }
@@ -121,30 +121,30 @@ public class AuthorController {
     public void displayAuthor(){
         boolean active = true;
         while(active){
-            System.out.println("Please enter author ID (0 to go back):");
+            System.out.println("Vänligen ange författar-ID (0 för att gå tillbaka):");
             int id = IO.inputNumber();
             if(id==0){
                 active = false;
             } else if(id<1){
-                System.out.println("ID has to be a positive number.");
+                System.out.println("ID måste vara ett positivt heltal.");
             } else if(!authorService.exists(id)) {
-                System.out.println("No author with that ID exists.");
+                System.out.println("Det finns ingen författare med det ID:t.");
             } else {
                 active = false;
                 Author author = authorService.getAuthorById(id);
-                System.out.println("First name: " + author.getFirstName());
-                System.out.println("Last name: " + author.getLastName());
-                System.out.println("Nationality: " + author.getNationality());
-                System.out.println("Birthdate: " + author.getBirthDate());
-                System.out.println("Biography: " + author.getBiography());
-                System.out.println("Website: " + author.getWebsite());
+                System.out.println("Förnamn: " + author.getFirstName());
+                System.out.println("Efternamn: " + author.getLastName());
+                System.out.println("Nationalitet: " + author.getNationality());
+                System.out.println("Födelsedatum: " + author.getBirthDate());
+                System.out.println("Biografi: " + author.getBiography());
+                System.out.println("Webbsida: " + author.getWebsite());
             }
         }
     }
 
     public void showAuthors() {
         ArrayList<AuthorListDTO> authors = authorService.getAllAuthorListDTOs();
-        System.out.println("ID | Name");
+        System.out.println("ID | Namn");
         for (AuthorListDTO author : authors) {
             System.out.println(author.getId() + " | " + author.getFullName());
         }
@@ -153,20 +153,20 @@ public class AuthorController {
     public void findByName(){
         boolean active = true;
         while (active) {
-            System.out.println("Please enter part of the author's name:");
+            System.out.println("Vänligen ange en del av författarens namn:");
             String name = scanner.nextLine().trim();
-            if(name=="") {
-                System.out.println("Name can't be empty.");
+            if(name.isEmpty()) {
+                System.out.println("Namnet kan inte vara tomt.");
             } else {
                 active = false;
                 ArrayList<AuthorListDTO> authors = authorService.getAuthorListDTOsByPartialName(name);
-                if(authors.isEmpty()) {
-                    System.out.println("ID | Name");
+                if(!authors.isEmpty()) {
+                    System.out.println("ID | Namn");
                     for (AuthorListDTO author : authors) {
                         System.out.println(author.getId() + " | " + author.getFullName());
                     }
                 } else {
-                    System.out.println("Could not find any matching authors.");
+                    System.out.println("Kunde inte hitta några matchande författare.");
                 }
             }
         }
@@ -175,20 +175,20 @@ public class AuthorController {
     public void findByNationality(){
         boolean active = true;
         while (active) {
-            System.out.println("Please enter part of the author's nationality:");
+            System.out.println("Vänligen ange en del av författarens nationalitet:");
             String nationality = scanner.nextLine().trim();
-            if(nationality=="") {
-                System.out.println("Nationality can't be empty.");
+            if(nationality.isEmpty()) {
+                System.out.println("Nationalitet kan inte vara tomt.");
             } else {
                 active = false;
                 ArrayList<AuthorListDTO> authors = authorService.getAuthorListDTOsByPartialNationality(nationality);
-                if(authors.isEmpty() {
-                    System.out.println("ID | Name");
+                if(!authors.isEmpty()) {
+                    System.out.println("ID | Namn");
                     for (AuthorListDTO author : authors) {
                         System.out.println(author.getId() + " | " + author.getFullName());
                     }
                 } else {
-                    System.out.println("Could not find any matching authors.");
+                    System.out.println("Kunde inte hitta några matchande författare.");
                 }
             }
         }
@@ -198,7 +198,7 @@ public class AuthorController {
         boolean active = true;
         ArrayList<BookListDTO> books;
         while(active){
-            System.out.println("Please enter author ID (or 0 to go back):");
+            System.out.println("Vänligen ange författar-ID (0 för att gå tillbaka):");
             int id = IO.inputNumber();
             if(id==0) {
                 active = false;
@@ -207,15 +207,15 @@ public class AuthorController {
                 active = false;
                 books = authorService.getBooksByAuthorId(id);
                 if(!books.isEmpty()) {
-                    System.out.println("ID | Title");
+                    System.out.println("ID | Titel");
                     for (BookListDTO book : books){
                         System.out.println(book.getBookId() + " | " + book.getTitle());
                     }
                 } else {
-                    System.out.println("No books found by that author.");
+                    System.out.println("Kunde inte hitta några böcker av den författaren.");
                 }
             } else {
-                System.out.println("No author with that ID exists.");
+                System.out.println("Det finns ingen författare med det ID:t.");
             }
         }
     }
@@ -223,34 +223,34 @@ public class AuthorController {
     public void deleteAuthor(){
         boolean active = true;
         while(active){
-            System.out.println("Please enter author ID (0 to go back):");
+            System.out.println("Vänligen ange författar-ID (0 för att gå tillbaka):");
             int id = IO.inputNumber();
             if(id==0){
                 active = false;
             } else if(id<1){
-                System.out.println("ID has to be a positive number.");
+                System.out.println("ID måste vara ett positivt heltal.");
             } else if(!authorService.exists(id)) {
-                System.out.println("No author with that ID exists.");
+                System.out.println("Det finns ingen författare med det ID:t.");
             } else {
                 active = false;
                 Author author = authorService.getAuthorById(id);
-                System.out.println("First name: " + author.getFirstName());
-                System.out.println("Last name: " + author.getLastName());
-                System.out.println("Nationality: " + author.getNationality());
-                System.out.println("Birthdate: " + author.getBirthDate());
-                System.out.println("Biography: " + author.getBiography());
-                System.out.println("Website: " + author.getWebsite());
-                System.out.println("Enter \"DELETE\" in all caps to delete author.");
+                System.out.println("Förnamn: " + author.getFirstName());
+                System.out.println("Efternamn: " + author.getLastName());
+                System.out.println("Nationalitet: " + author.getNationality());
+                System.out.println("Födelsedatum: " + author.getBirthDate());
+                System.out.println("Biografi: " + author.getBiography());
+                System.out.println("Webbsida: " + author.getWebsite());
+                System.out.println("Skriv \"RADERA\" med versaler för att radera författaren.");
                 String choice = scanner.nextLine().trim();
-                if(choice=="DELETE") {
+                if(choice.equals("RADERA")) {
                     try {
                         authorService.delete(author);
-                        System.out.println(author.getFullName() + " deleted.");
+                        System.out.println(author.getFullName() + " raderad.");
                     } catch (CantDeleteAuthorException e) {
                         System.out.println(e.getMessage());
                     }
                 } else {
-                    System.out.println("Author not deleted.");
+                    System.out.println("Författaren ej raderad.");
                 }
             }
         }
@@ -260,12 +260,12 @@ public class AuthorController {
         boolean active = true;
         String firstName = "";
         while (active) {
-            System.out.println("Please enter the author's first name.");
+            System.out.println("Vänligen ange författarens förnamn.");
             firstName = scanner.nextLine().trim();
             if(firstName.length()>0) {
                 active=false;
             } else {
-                System.out.println("Can't accept an empty name.");
+                System.out.println("Kan inte ta emot ett tomt namn.");
             }
         }
         return firstName;
@@ -275,12 +275,12 @@ public class AuthorController {
         boolean active = true;
         String lastName = "";
         while (active) {
-            System.out.println("Please enter the author's last name.");
+            System.out.println("Vänligen ange författarens efternamn.");
             lastName = scanner.nextLine().trim();
             if(lastName.length()>0) {
                 active=false;
             } else {
-                System.out.println("Can't accept an empty name.");
+                System.out.println("Kan inte ta emot ett tomt namn.");
             }
         }
         return lastName;
@@ -290,12 +290,12 @@ public class AuthorController {
         boolean active = true;
         String nationality = "";
         while (active) {
-            System.out.println("Please enter the author's nationality.");
+            System.out.println("Vänligen ange författarens nationalitet.");
             nationality = scanner.nextLine().trim();
             if(nationality.length()>0) {
                 active=false;
             } else {
-                System.out.println("Can't accept an empty nationality.");
+                System.out.println("Kan inte ta emot en tom nationalitet.");
             }
         }
         return nationality;
@@ -303,7 +303,7 @@ public class AuthorController {
 
     public String askForBiography(){
         String biography;
-        System.out.println("Please enter the author's biography.");
+        System.out.println("Vänligen skriv in författarens biografi.");
         biography = scanner.nextLine().trim();
         return biography;
     }
@@ -313,12 +313,14 @@ public class AuthorController {
         boolean active = true;
         String website = "";
         while (active) {
-            System.out.println("Please enter the author's website.");
+            System.out.println("Vänligen ange författarens webbsida.");
             website = scanner.nextLine().trim();
-            if(!urlValidator.isValid(website)) {
-                System.out.println("Please enter a valid website.");
-            } else {
-                active = false;
+            if (!website.isEmpty()) {
+                if (!urlValidator.isValid(website)) {
+                    System.out.println("Vänligen ange en giltig webbadress.");
+                } else {
+                    active = false;
+                }
             }
         }
         return website;
@@ -326,15 +328,15 @@ public class AuthorController {
 
     public LocalDate askForBirthDate(){
         boolean active = true;
-        LocalDate birthdate;
+        LocalDate birthdate = null;
         while(active) {
-            System.out.println("Please enter the author's birthdate (YYYY-MM-DD):");
+            System.out.println("Vänligen ange författarens födelsedatum (ÅÅÅÅ-MM-DD):");
             String dateString = scanner.nextLine().trim();
             try {
                 birthdate = LocalDate.parse(dateString);
                 active = false;
             } catch (DateTimeParseException e) {
-                System.out.println("Date not valid.");
+                System.out.println("Vänligen ange ett giltigt datum.");
             }
         }
         return birthdate;

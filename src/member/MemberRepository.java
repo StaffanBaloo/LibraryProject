@@ -3,7 +3,8 @@ package member;
 import java.sql.*;
 import java.util.ArrayList;
 
-import Repository;
+import prime.DateConverter;
+import prime.Repository;
 import exceptions.CantCreateMemberException;
 import exceptions.MemberNotFoundException;
 
@@ -61,7 +62,7 @@ public class MemberRepository extends Repository {
             """)) {
             stmt.setInt(1,memberId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
+            if (rs.next()) {
                 if(rs.getInt("number")>0) {
                     exists = true;
                 }
@@ -79,7 +80,7 @@ public class MemberRepository extends Repository {
             stmt.setString(1, mail);
             ResultSet rs = stmt.executeQuery();
 
-            if (rs.first()) {
+            if (rs.next()) {
                 member = mapRow(rs);
             } else {
                 throw (new MemberNotFoundException("Could not find member with email "+mail+"."));
@@ -98,7 +99,7 @@ public class MemberRepository extends Repository {
             stmt.setInt(1, memberId);
             ResultSet rs = stmt.executeQuery();
 
-            if (rs.first()) {
+            if (rs.next()) {
                 member = mapRow(rs);
             } else {
                 throw (new MemberNotFoundException("Could not find member with ID "+memberId+"."));
@@ -128,7 +129,7 @@ public class MemberRepository extends Repository {
             stmt.setString(5, member.getMembershipType());
             stmt.setString(6, member.getStatus());
             stmt.setInt(7, member.getMemberId());
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());
         }
@@ -139,18 +140,18 @@ public class MemberRepository extends Repository {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement insert = conn.prepareStatement("""
                 INSERT INTO members (first_name, last_name, email, membership_date, membership_type, status)
-                VALUES (?, ?, ?, ?, ?, ?)""")) {
+                VALUES (?, ?, ?, ?, ?, ?)""", Statement.RETURN_GENERATED_KEYS)) {
             insert.setString(1, member.getFirstName());
             insert.setString(2, member.getLastName());
             insert.setString(3, member.getEmail());
             insert.setDate(4, Date.valueOf(member.getMembershipDate()));
             insert.setString(5, member.getMembershipType());
             insert.setString(6, member.getStatus());
-            ResultSet insertSet = insert.getGeneratedKeys();
             int insertRowCount = insert.executeUpdate();
+            ResultSet insertSet = insert.getGeneratedKeys();
             if(insertRowCount>0){
                 if(insertSet.next()){
-                    int newMemberId=insertSet.getInt("id");
+                    int newMemberId=insertSet.getInt(1);
                     member.setMemberId(newMemberId);
                 }
             } else {
@@ -170,7 +171,7 @@ public class MemberRepository extends Repository {
                     rs.getString("email"),
                     rs.getString("membership_type"),
                     rs.getString("status"),
-                    rs.getDate("membership_date").toLocalDate());
+                    DateConverter.toLocalDate(rs.getDate("membership_date")));
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());
         }

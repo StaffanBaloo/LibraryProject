@@ -1,6 +1,6 @@
 package category;
 
-import Repository;
+import prime.Repository;
 import exceptions.CantCreateCategoryException;
 import exceptions.CantDeleteCategoryException;
 
@@ -88,7 +88,7 @@ public class CategoryRepository extends Repository {
             """)) {
             stmt.setInt(1,categoryId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
+            if (rs.next()) {
                 if(rs.getInt("number")>0) {
                     exists = true;
                 }
@@ -101,14 +101,14 @@ public class CategoryRepository extends Repository {
 
     public void addCategory(Category category){
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement insert = conn.prepareStatement("INSERT INTO categories (name, description) VALUES (?, ?);")) {
+             PreparedStatement insert = conn.prepareStatement("INSERT INTO categories (name, description) VALUES (?, ?);",Statement.RETURN_GENERATED_KEYS)) {
             insert.setString(1, category.getName());
             insert.setString(2, category.getDescription());
-            ResultSet insertSet = insert.getGeneratedKeys();
             int insertRowCount = insert.executeUpdate();
+            ResultSet insertSet = insert.getGeneratedKeys();
             if(insertRowCount>0){
                 if(insertSet.next()){
-                    int newCategoryId=insertSet.getInt("id");
+                    int newCategoryId=insertSet.getInt(1);
                     category.setId(newCategoryId);
                 }
             } else {
@@ -161,7 +161,7 @@ public class CategoryRepository extends Repository {
     }
 
     private Category mapRow(ResultSet rs) {
-        Category category;
+        Category category = new Category();
         try {
             category = new Category(rs.getInt("id"),
                     rs.getString("name"),

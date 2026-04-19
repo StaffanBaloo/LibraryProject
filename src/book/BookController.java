@@ -3,8 +3,8 @@ package book;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
-import IO;
-import Main;
+import prime.IO;
+import prime.Main;
 import author.*;
 import category.*;
 import loan.*;
@@ -27,17 +27,17 @@ public class BookController {
 
         while (active) {
             System.out.println("""
-                    Book menu:
-                    1. Display all books.
-                    2. Display all available books.
-                    3. Search books by author.
-                    4. Search books by title.
-                    5. Search books by category.
-                    6. Search books by keyword.
-                    7. Display detailed book info by ID.
-                    8. Borrow book.
-                    0. Back.""");
-            int choice=Integer.parseInt(scanner.nextLine());
+                    Bokmeny:
+                    1. Visa alla böcker.
+                    2. Visa alla tillgängliga böcker.
+                    3. Sök böcker på författare.
+                    4. Sök böcker på titel.
+                    5. Sök böcker på kategori.
+                    6. Sök böcker på nyckelord.
+                    7. Visa detaljerad bokinformation på ID.
+                    8. Låna bok.
+                    0. Gå tillbaka.""");
+            int choice=IO.inputNumber();
             switch (choice) {
                 case 1 -> showAllBooks();
                 case 2 -> showAvailableBooks();
@@ -48,6 +48,7 @@ public class BookController {
                 case 7 -> showDetailedInfo();
                 case 8 -> borrowBook();
                 case 0 -> active = false;
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
@@ -57,18 +58,18 @@ public class BookController {
         int choice;
         while (active) {
             System.out.println("""
-                    Welcome, librarian!
-                    1. Display all books.
-                    2. Display all available books.
-                    3. Search books by author.
-                    4. Search books by title.
-                    5. Search books by category.
-                    6. Search books by keyword.
-                    7. Display detailed book info by ID.
-                    8. Add book.
-                    9. Edit book.
-                    10. Delete book.
-                    0. Back.""");
+                    Välkommen, biblotekarie!
+                    1. Visa alla böcker.
+                    2. Visa alla tillgängliga böcker.
+                    3. Sök böcker på författare.
+                    4. Sök böcker på titel.
+                    5. Sök böcker på kategori.
+                    6. Sök böcker på nyckelord.
+                    7. Visa detaljerad bokinformation på ID.
+                    8. Lägg till bok.
+                    9. Redigera bok.
+                    10. Ta bort bok.
+                    0. Gå tillbaka.""");
             choice = IO.inputNumber();
             switch (choice) {
                 case 1 -> showAllBooks();
@@ -82,12 +83,14 @@ public class BookController {
                 case 9 -> editBook();
                 case 10 -> deleteBook();
                 case 0 -> active = false;
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
 
     public void showAllBooks(){
         ArrayList<BookListDTO> bookDTOs = bookListDTOService.getAllBooksList();
+        System.out.println("ID | Titel | Författare | Tillgängliga exemplar");
         for (BookListDTO bookDTO : bookDTOs) {
             System.out.println(bookDTO.toString());
         }
@@ -95,6 +98,7 @@ public class BookController {
 
     public void showAvailableBooks(){
         ArrayList<BookListDTO> bookDTOs = bookListDTOService.getAvailableBooksList();
+        System.out.println("ID | Titel | Författare | Tillgängliga exemplar");
         for (BookListDTO bookDTO : bookDTOs) {
             System.out.println(bookDTO.toString());
         }
@@ -102,80 +106,134 @@ public class BookController {
 
     public void findByAuthor(){
         ArrayList<BookListDTO> bookDTOs;
-        System.out.println("Please enter author:");
+        System.out.println("Vänligen ange författare:");
         String searchTerm = scanner.nextLine().trim();
         if (IO.isNumeric(searchTerm)){
             bookDTOs = bookListDTOService.getBookListByAuthorId(Integer.parseInt(searchTerm));
         } else {
             bookDTOs = bookListDTOService.getBookListByAuthorName(searchTerm);
         }
-        for (BookListDTO bookDTO : bookDTOs) {
-            System.out.println(bookDTO.toString());
+        if(bookDTOs.isEmpty()){
+            System.out.println("Hittade inga böcker.");
+        } else {
+            System.out.println("ID | Titel | Författare | Tillgängliga exemplar");
+            for (BookListDTO bookDTO : bookDTOs) {
+                System.out.println(bookDTO.toString());
+            }
         }
     }
 
     public void findByTitle(){
-        System.out.println("Please enter title:");
+        System.out.println("Vänligen ange titel:");
         String searchTerm = scanner.nextLine();
         ArrayList<BookListDTO> bookDTOs = bookListDTOService.getBookListByTitle(searchTerm);
-        for (BookListDTO bookDTO : bookDTOs) {
-            System.out.println(bookDTO.toString());
+        if(bookDTOs.isEmpty()){
+            System.out.println("Hittade inga böcker.");
+        } else {
+            System.out.println("ID | Titel | Författare | Tillgängliga exemplar");
+            for (BookListDTO bookDTO : bookDTOs) {
+                System.out.println(bookDTO.toString());
+            }
         }
     }
 
     public void findByCategory(){
         ArrayList<BookListDTO> bookDTOs;
-        System.out.println("Please enter category:");
+        System.out.println("Vänligen ange kategori:");
         String searchTerm = scanner.nextLine();
         if (IO.isNumeric(searchTerm)){
             bookDTOs = bookListDTOService.getBookListByCategoryId(Integer.parseInt(searchTerm));
         } else {
             bookDTOs = bookListDTOService.getBookListByCategory(searchTerm);
         }
-        for (BookListDTO bookDTO : bookDTOs) {
-            System.out.println(bookDTO.toString());
+        if(bookDTOs.isEmpty()){
+            System.out.println("Hittade inga böcker.");
+        } else {
+            System.out.println("ID | Titel | Författare | Tillgängliga exemplar");
+            for (BookListDTO bookDTO : bookDTOs) {
+                System.out.println(bookDTO.toString());
+            }
         }
     }
 
     public void findByKeyword(){
-        System.out.println("Please enter keyword:");
+        System.out.println("Vänligen ange nyckelord:");
         String searchTerm = scanner.nextLine();
         ArrayList<BookListDTO> bookDTOs = bookListDTOService.getBookListByKeyword(searchTerm);
-        for (BookListDTO bookDTO : bookDTOs) {
-            System.out.println(bookDTO.toString());
+        if(bookDTOs.isEmpty()){
+            System.out.println("Hittade inga böcker.");
+        } else {
+            System.out.println("ID | Titel | Författare | Tillgängliga exemplar");
+            for (BookListDTO bookDTO : bookDTOs) {
+                System.out.println(bookDTO.toString());
+            }
         }
     }
 
     public void showDetailedInfo(){
-        System.out.println("Please enter book ID:");
+        System.out.println("Vänligen ange bok-ID:");
         int searchId = IO.inputNumber();
-        Book book = bookService.getBookById(searchId);
-        System.out.println(book.toString());
+        if(bookService.exists(searchId)) {
+            Book book = bookService.getBookById(searchId);
+            System.out.println("Bok-ID: "+book.getBookId());
+            System.out.println("Titel: "+book.getTitle());
+            System.out.println("Författare: "+book.listAuthors());
+            System.out.println("Kategorier: " + book.listCategories());
+            System.out.println("Sammanfattning: " + book.getSummary());
+            System.out.println("ISBN: "+book.getIsbn());
+            System.out.println("Publikationsår: " + book.getYearPublished());
+            System.out.println("Språk: " + book.getLanguage());
+            System.out.println("Sidantal: " + book.getPageCount());
+            System.out.println("Exemplar: " + book.getAvailableCopies() + "/" +book.getTotalCopies());
+        }
+        else {
+            System.out.println("Hittade inte bok med ID " + searchId + ".");
+        }
     }
 
     public void borrowBook(){
-        System.out.println("Please enter book ID:");
+        System.out.println("Vänligen ange bok-ID:");
         int bookId = Integer.parseInt(scanner.nextLine().trim());
         try {
             Book book = bookService.getBookById(bookId);
             loanService.createLoan(book, Main.loggedInUser);
         }
         catch (CantCreateLoanException e) {
-            System.out.println("You can't borrow book "+ bookId + ".");
+            System.out.println("Du kan inte låna bok "+ bookId + ".");
             System.out.println(e.getMessage());
         }
     }
 
     public void deleteBook(){
-        System.out.println("Please enter book ID:");
-        int bookId = IO.inputNumber();
-        try {
-            Book book = bookService.getBookById(bookId);
-            bookService.remove(book);
-        } catch (BookDoesNotExistException e) {
-            System.out.println("There is no book with that ID.");
-        } catch (CantRemoveBookException e) {
-            System.out.println(e.getMessage());
+        System.out.println("Vänligen ange bok-ID:");
+        int searchId = IO.inputNumber();
+        if(bookService.exists(searchId)) {
+            Book book = bookService.getBookById(searchId);
+            System.out.println("Bok-ID: "+book.getBookId());
+            System.out.println("Titel: "+book.getTitle());
+            System.out.println("Författare: "+book.listAuthors());
+            System.out.println("Kategorier: " + book.listCategories());
+            System.out.println("Sammanfattning: " + book.getSummary());
+            System.out.println("ISBN: "+book.getIsbn());
+            System.out.println("Publikationsår: " + book.getYearPublished());
+            System.out.println("Språk: " + book.getLanguage());
+            System.out.println("Sidantal: " + book.getPageCount());
+            System.out.println("Exemplar: " + book.getAvailableCopies() + "/" +book.getTotalCopies());
+            System.out.println("Skriv \"RADERA\" med versaler för att radera författaren.");
+            String choice = scanner.nextLine().trim();
+            if(choice.equals("RADERA")) {
+                try {
+                    bookService.remove(book);
+                    System.out.println(book.getTitle() + " raderad.");
+                } catch (CantRemoveBookException e) {
+                    System.out.println(e.getMessage());
+                }
+            } else {
+                System.out.println("Författaren ej raderad.");
+            }
+        }
+        else {
+            System.out.println("Hittade inte författare med ID " + searchId + ".");
         }
     }
 
@@ -197,6 +255,7 @@ public class BookController {
         Book book = new Book(title, isbn, yearPublished, copies, copies, summary, pageCount, language);
         try {
             bookService.addBook(book, authorIdList, categoryIdList);
+            System.out.println("Boken " +  book.getTitle() + " skapad med ID "+book.getBookId()+".");
         } catch (CantCreateBookException e) {
             System.out.println(e.getMessage());
         }
@@ -211,29 +270,29 @@ public class BookController {
         ArrayList<Category> categories;
         Book book = null;
         while (active) {
-            System.out.println("Which book do you wish to edit?");
+            System.out.println("Vänligen ange bok-ID:");
             int id = IO.inputNumber();
             if (bookService.exists(id)) {
                 book = bookService.getBookById(id);
                 active = false;
             } else {
-                System.out.println("There is no book with that ID.");
+                System.out.println("Det finns ingen bok med det ID:t.");
             }
         }
         active = true;
         while (active) {
             System.out.println("What do you wish to edit?");
-            System.out.println("1. Title: " + book.getTitle());
+            System.out.println("1. Titel: " + book.getTitle());
             System.out.println("2. ISBN: " + book.getIsbn());
-            System.out.println("3. Year Published: " + book.getYearPublished());
-            System.out.println("4. Number of copies: " + book.getTotalCopies());
-            System.out.println("5. Summary: " + book.getSummary());
-            System.out.println("6. Page count: " + book.getPageCount());
-            System.out.println("7. Language: " + book.getLanguage());
-            System.out.println("8. Authors: " +book.listAuthors() + " (this will save the changes immediately)");
-            System.out.println("9. Categories: "+book.listCategories() + " (this will save the changes immediately)");
-            System.out.println("10. Save and exit");
-            System.out.println("0. Exit without saving.");
+            System.out.println("3. Publikationsår: " + book.getYearPublished());
+            System.out.println("4. Antal exemplar: " + book.getTotalCopies());
+            System.out.println("5. Sammanfattning: " + book.getSummary());
+            System.out.println("6. Sidantal: " + book.getPageCount());
+            System.out.println("7. Språk: " + book.getLanguage());
+            System.out.println("8. Författare: " +book.listAuthors() + " (this will save the changes immediately)");
+            System.out.println("9. Kategorier: "+book.listCategories() + " (this will save the changes immediately)");
+            System.out.println("10. Spara och gå tillbaka.");
+            System.out.println("0. Gå tillbaka utan att spara.");
             int choice = IO.inputNumber();
             switch (choice){
                 case 1 ->{
@@ -250,10 +309,11 @@ public class BookController {
                 }
                 case 4 ->{
                     copies = askForCopies();
-                    int copiesChange = book.getTotalCopies()-copies;
+                    int copiesChange = copies-book.getTotalCopies();
                     book.setTotalCopies(copies);
                     //Change available copies by the same amount as total copies, but with a minimum of 0.
                     book.setAvailableCopies(Math.max(0, book.getAvailableCopies()+copiesChange));
+                    System.out.println("Det kommer nu att finnas "+book.getAvailableCopies()+ " exemplar tillgängliga av "+book.getTotalCopies()+".");
                 }
                 case 5 ->{
                     summary = askForSummary();
@@ -276,9 +336,13 @@ public class BookController {
                     book.setCategories(categories);
                 }
                 case 10 ->{
-                    bookService.save(book);
-                    bookService.saveAuthors(book);
-                    bookService.saveCategories(book);
+                    try {
+                        bookService.save(book);
+                        bookService.saveAuthors(book);
+                        bookService.saveCategories(book);
+                    } catch (CantCreateBookException e) {
+                        System.out.println(e.getMessage());
+                    }
                     active = false;
                 }
                 case 0 -> active = false;
@@ -291,67 +355,67 @@ public class BookController {
         ArrayList<Author> newAuthors = (ArrayList<Author>) authors.clone();
         while(active){
             if(newAuthors.isEmpty()) {
-                System.out.println("The book does not currently have any authors.");
+                System.out.println("Boken har för närvarande inga författare.");
             } else {
-                System.out.println("Current Authors:");
+                System.out.println("Nuvarande författare:");
                 for (Author author : newAuthors) {
                     System.out.println(author.getId() + " | " + author.getFullName());
                 }
             }
             System.out.println("""
-                1. Add author by author ID.
-                2. Remove author by author ID.
-                3. Display all authors.
-                4. Find authors by partial name.
-                0. Finish editing authors.""");
+                1. Lägg till författare med författar-ID.
+                2. Ta bort författare med författar-ID.
+                3. Visa alla författare.
+                4. Sök författare på partiellt namn.
+                0. Avsluta redigering av författare.""");
             int choice = IO.inputNumber();
             switch (choice){
                 case 1 -> {
-                    System.out.println("Please enter author ID:");
+                    System.out.println("Vänligen ange författar-ID:");
                     int id = IO.inputNumber();
                     if (authorService.exists(id)) {
                         if(!existsInAuthorList(newAuthors,id)){
                             newAuthors.add(authorService.getAuthorById(id));
                         } else {
-                            System.out.println("That author is already in the list.");
+                            System.out.println("Den författaren finns redan i listan.");
                         }
                     } else {
-                        System.out.println("That author ID does not exist.");
+                        System.out.println("Det finns ingen författare med det ID:t.");
                     }
                 }
 
                 case 2 -> {
-                    System.out.println("Please enter author ID:");
+                    System.out.println("Vänligen ange författar-ID:");
                     int id = IO.inputNumber();
                     if (authorService.exists(id)) {
                         removeFromAuthorList(newAuthors, id);
                     } else {
-                        System.out.println("That author ID does not exist.");
+                        System.out.println("Det finns ingen författare med det ID:t.");
                     }
                 }
 
                 case 3 -> {
                     ArrayList<AuthorListDTO> authorlist = authorService.getAllAuthorListDTOs();
-                    System.out.println("ID | Name");
+                    System.out.println("ID | Namn");
                     for (AuthorListDTO author : authorlist) {
                         System.out.println(author.toString());
                     }
                 }
                 case 4 -> {
-                    System.out.println("Please enter partial name:");
+                    System.out.println("Vänligen ange del av namnet:");
                     String name = scanner.nextLine().trim();
                     ArrayList<AuthorListDTO> authorlist = authorService.getAuthorListDTOsByPartialName(name);
                     if(authorlist.isEmpty()){
-                        System.out.println("There are no authors with that name.");
+                        System.out.println("Det finns ingen författare med det ID:t.");
                     } else {
-                        System.out.println("ID | Name");
+                        System.out.println("ID | Namn");
                         for (AuthorListDTO author : authorlist) {
                             System.out.println(author.toString());
                         }
                     }
                 }
                 case 0 -> active=false;
-                case default -> System.out.println("Please enter a valid option.");
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
         return newAuthors;
@@ -362,67 +426,67 @@ public class BookController {
         ArrayList<Category> newCategories = (ArrayList<Category>) categories.clone();
         while(active){
             if(newCategories.isEmpty()) {
-                System.out.println("The book does not currently have any categories.");
+                System.out.println("Boken har för närvarande inga kategorier.");
             } else {
-                System.out.println("Current Categories:");
+                System.out.println("Nuvarande kategorier:");
                 for (Category category : newCategories) {
                     System.out.println(category.getId() + " | " + category.getName());
                 }
             }
             System.out.println("""
-                1. Add category by category ID.
-                2. Remove category by category ID.
-                3. Display all categories.
-                4. Find categories by partial name.
-                0. Finish editing categories.""");
+                1. Lägg till kategori med kategori-ID.
+                2. Ta bort kategori med kategori-ID.
+                3. Visa alla kategorier.
+                4. Sök kategorier på partiellt namn.
+                0. Avsluta redigering av kategorier.""");
             int choice = IO.inputNumber();
             switch (choice){
                 case 1 -> {
-                    System.out.println("Please enter category ID:");
+                    System.out.println("Vänligen ange kategori-ID:");
                     int id = IO.inputNumber();
                     if (categoryService.exists(id)) {
                         if(!existsInCategoryList(newCategories,id)){
                             newCategories.add(categoryService.getCategoryById(id));
                         } else {
-                            System.out.println("That category is already in the list.");
+                            System.out.println("Den kategorin finns redan i listan.");
                         }
                     } else {
-                        System.out.println("That category ID does not exist.");
+                        System.out.println("Det finns ingen kategori med det ID:t.");
                     }
                 }
 
                 case 2 -> {
-                    System.out.println("Please enter category ID:");
+                    System.out.println("Vänligen ange kategori-ID:");
                     int id = IO.inputNumber();
                     if (categoryService.exists(id)) {
                         removeFromCategoryList(newCategories, id);
                     } else {
-                        System.out.println("That category ID does not exist.");
+                        System.out.println("Det finns ingen kategori med det ID:t.");
                     }
                 }
 
                 case 3 -> {
                     ArrayList<Category> categorylist = categoryService.getAllCategories();
-                    System.out.println("ID | Name");
+                    System.out.println("ID | Namn");
                     for (Category category : categorylist) {
                         System.out.println(category.getId() + " | " + category.getName());
                     }
                 }
                 case 4 -> {
-                    System.out.println("Please enter partial name:");
+                    System.out.println("Vänligen ange en del av namnet:");
                     String name = scanner.nextLine().trim();
                     ArrayList<Category> categorylist = categoryService.getCategoriesByPartialName(name);
                     if(categories.isEmpty()){
-                        System.out.println("There are no categories with that name.");
+                        System.out.println("Det finns ingen kategori med det ID:t.");
                     } else {
-                        System.out.println("ID | Name");
+                        System.out.println("ID | Namn");
                         for (Category category : categorylist) {
                             System.out.println(category.getId() + " | " + category.getName());
                         }
                     }
                 }
                 case 0 -> active=false;
-                case default -> System.out.println("Please enter a valid option.");
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
         return newCategories;
@@ -433,43 +497,44 @@ public class BookController {
         ArrayList<Integer> authorIdList = new ArrayList<>();
         while (active){
             System.out.println("""
-                    Author list menu
-                    1. Add author by author ID.
-                    2. Display author list.
-                    3. Find authors by partial name.
-                    0. Finish adding authors.""");
+                    Författarlistemeny
+                    1. Lägg till författare med ID.
+                    2. Visa författarlista.
+                    3. Sök författare på del av namnet.
+                    0. Avsluta redigering av författare.""");
             int choice = IO.inputNumber();
             switch (choice){
                 case 1 -> {
+                    System.out.println("Vänligen ange författar-ID:");
                     int id = IO.inputNumber();
                     if (authorService.exists(id)) {
                         authorIdList.add(id);
                     } else {
-                        System.out.println("That author ID does not exist.");
+                        System.out.println("Det finns ingen författare med det ID:t.");
                     }
                 }
                 case 2 -> {
                     ArrayList<AuthorListDTO> authors = authorService.getAllAuthorListDTOs();
-                    System.out.println("ID | Name");
+                    System.out.println("ID | Namn");
                     for (AuthorListDTO author : authors) {
                         System.out.println(author.toString());
                     }
                 }
                 case 3 -> {
-                    System.out.println("Please enter partial name:");
+                    System.out.println("Vänligen ange en del av namnet:");
                     String name = scanner.nextLine().trim();
                     ArrayList<AuthorListDTO> authors = authorService.getAuthorListDTOsByPartialName(name);
                     if(authors.isEmpty()){
-                        System.out.println("There are no authors with that name.");
+                        System.out.println("Det finns ingen författare med det ID:t.");
                     } else {
-                        System.out.println("ID | Name");
+                        System.out.println("ID | Namn");
                         for (AuthorListDTO author : authors) {
                             System.out.println(author.toString());
                         }
                     }
                 }
                 case 0 -> active=false;
-                case default -> System.out.println("Please enter a valid option.");
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
         return authorIdList;
@@ -480,56 +545,57 @@ public class BookController {
         ArrayList<Integer> categoryIdList = new ArrayList<>();
         while (active){
             System.out.println("""
-                    Author list menu
-                    1. Add category by category ID.
-                    2. Display category list.
-                    3. Find categories by partial name.
-                    0. Finish adding categories.""");
+                    Kategorilistemeny
+                    1. Lägg till kategori med ID.
+                    2. Visa kategorilista.
+                    3. Sök kategori på del av namnet.
+                    0. Avsluta redigering av kategorilista.""");
             int choice = IO.inputNumber();
             switch (choice){
                 case 1 -> {
+                    System.out.println("Vänligen ange kategori-ID.");
                     int id = IO.inputNumber();
                     if (categoryService.exists(id)) {
                         categoryIdList.add(id);
                     } else {
-                        System.out.println("That category ID does not exist.");
+                        System.out.println("Det finns ingen kategori med det ID:t.");
                     }
                 }
                 case 2 -> {
                     ArrayList<Category> categories = categoryService.getAllCategories();
-                    System.out.println("ID | Category | Description");
+                    System.out.println("ID | Kategori | Beskrivning");
                     for (Category category : categories) {
                         System.out.println(category.toString());
                     }
                 }
                 case 3 -> {
-                    System.out.println("Please enter partial name:");
+                    System.out.println("Vänligen ange en del av namnet:");
                     String name = scanner.nextLine().trim();
                     ArrayList<Category> categories = categoryService.getCategoriesByPartialName(name);
                     if(categories.isEmpty()){
-                        System.out.println("There are no categories with that name.");
+                        System.out.println("Det finns ingen kategori med det namnet.");
                     } else {
-                        System.out.println("ID | Category | Description");
+                        System.out.println("ID | Kategori | Beskrivning");
                         for (Category category : categories) {
                             System.out.println(category.toString());
                         }
                     }
                 }
                 case 0 -> active=false;
-                case default -> System.out.println("Please enter a valid option.");
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
         return categoryIdList;
     }
 
     public String askForTitle(){
-        System.out.println("Please enter book title:");
+        System.out.println("Vänligen ange bokens titel:");
         String title = scanner.nextLine().trim();
         return title;
     }
 
     public String askForISBN(){
-        System.out.println("Please enter ISBN:");
+        System.out.println("Vänligen ange ISBN:");
         String isbn = scanner.nextLine().trim();
         // I choose not to validate ISBN because doing that properly would add a lot of work to testing that's beyond the scope of the project.
         return isbn;
@@ -539,10 +605,10 @@ public class BookController {
         boolean active = true;
         int yearPublished = 0;
         while(active){
-            System.out.println("Please enter publication year:");
+            System.out.println("Vänligen ange publikationsår:");
             yearPublished = IO.inputNumber();
             if(yearPublished> LocalDate.now().getYear()) {
-                System.out.println("The publication year must be this year or earlier.");
+                System.out.println("Publikationsåret måste vara i år eller tidigare.");
             } else {
                 active = false;
             }
@@ -554,10 +620,10 @@ public class BookController {
         boolean active = true;
         int copies =0;
         while (active){
-            System.out.println("Please enter how many copies the library has:");
+            System.out.println("Vänligen ange hur många exemplar biblioteket har:");
             copies = IO.inputNumber();
             if(copies<0) {
-                System.out.println("The number of copies can't be negative.");
+                System.out.println("Antalet exemplar kan inte vara negativt.");
             } else {
                 active = false;
             }
@@ -566,7 +632,7 @@ public class BookController {
     }
 
     public String askForSummary(){
-        System.out.println("Please enter a summary of the book:");
+        System.out.println("Vänligen ange en sammanfattning av boken:");
         String summary = scanner.nextLine().trim();
         return summary;
     }
@@ -575,10 +641,10 @@ public class BookController {
         boolean active = true;
         int pageCount =0;
         while (active){
-            System.out.println("Please enter how many pages the book has:");
+            System.out.println("Vänligen ange hur många sidor boken har:");
             pageCount = IO.inputNumber();
             if(pageCount<0) {
-                System.out.println("Page count can't be negative.");
+                System.out.println("Boken kan inte ha ett negativt antal sidor.");
             } else {
                 active = false;
             }
@@ -590,10 +656,10 @@ public class BookController {
         boolean active = true;
         String language ="";
         while(active) {
-            System.out.println("Please enter the book's language:");
+            System.out.println("Vänligen ange bokens språk:");
             language = scanner.nextLine().trim();
             if(language.length()<2){
-                System.out.println("That is too short.");
+                System.out.println("Det är för kort.");
             } else {
                 language = language.substring(0,1).toUpperCase()+language.substring(1).toLowerCase();
                 active=false;
@@ -623,7 +689,7 @@ public class BookController {
                 return;
             }
         }
-        System.out.println("Author ID " + authorId + " not found in list.");
+        System.out.println("Författaren med ID " + authorId + " finns inte i listan.");
     }
 
     public void removeFromCategoryList(ArrayList<Category> categories, int categoryId) {
@@ -633,7 +699,7 @@ public class BookController {
                 return;
             }
         }
-        System.out.println("Category ID " + categoryId + " not found in list.");
+        System.out.println("Kategorin med ID " + categoryId + " finns inte i listan.");
     }
 
 }

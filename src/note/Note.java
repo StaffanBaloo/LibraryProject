@@ -45,6 +45,16 @@ public class Note {
         this.isRead = isRead;
     }
 
+    public Note() {
+        this.noteId = 0;
+        this.member = new Member();
+        this.loan = new Loan();
+        this.type = "";
+        this.message = "";
+        this.sentDate = LocalDate.of(1,1,1);
+        this.isRead = false;
+    }
+
     public String toString(){
         String temp = Integer.toString(noteId);
         temp+=" | " + type;

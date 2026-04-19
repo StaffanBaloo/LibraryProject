@@ -1,7 +1,9 @@
+package prime;
+
 @SuppressWarnings("unused")
 public class ANSI {
     // https://en.wikipedia.org/wiki/ANSI_escape_code#Select_Graphic_Rendition_parameters
-    // ANSI escape sequences for styling terminal output
+    // prime.ANSI escape sequences for styling terminal output
 
     // reset all styling to their default values
     public static String reset() {

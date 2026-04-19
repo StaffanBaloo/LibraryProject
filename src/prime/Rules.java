@@ -1,3 +1,5 @@
+package prime;
+
 import java.time.LocalDate;
 
 public class Rules {
@@ -13,27 +15,19 @@ public class Rules {
 
     public static int fineByMembershipType(String type) {
         int fine = overdueFineStandard;
-        switch (type.toLowerCase()){
-            case "standard" -> fine = overdueFineStandard;
-            case "premium"-> fine = overdueFinePremium;
-        }
+        if(type.equalsIgnoreCase("premium")) fine = overdueFinePremium;
         return fine;
     }
 
     public static int weeksByMembershipType (String type) {
         int duration = loanDurationStandard;
-        switch (type.toLowerCase()) {
-            case "standard" -> duration = loanDurationStandard;
-            case "premium" -> duration = loanDurationPremium;
-        }
+        if(type.equalsIgnoreCase("premium")) duration = loanDurationPremium;
         return duration;
     }
 
     public static LocalDate suspensionDateByMembershipType(String type){
         LocalDate limitDate = LocalDate.now().minusDays(maxOverdueStandard);
-        if(type == "premium") {
-            limitDate = LocalDate.now().minusDays(maxOverduePremium);
-        }
+        if(type.equalsIgnoreCase("premium")) limitDate = LocalDate.now().minusDays(maxOverduePremium);
         return limitDate;
     }
 

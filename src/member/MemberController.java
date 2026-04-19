@@ -2,9 +2,9 @@ package member;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import Main;
-import IO;
-import ANSI;
+import prime.Main;
+import prime.IO;
+import prime.ANSI;
 import exceptions.CantCreateMemberException;
 import exceptions.MemberNotFoundException;
 import fine.Fine;
@@ -24,18 +24,19 @@ public class MemberController {
 
         while (active) {
             System.out.println("""
-                    What do you want to do?
-                    1. View membership information.
-                    2. Change personal information.
-                    3. Change membership type.
-                    0. Go back.""");
+                    Medlemsmeny:
+                    1. Visa medlemsinformation.
+                    2. Ändra personlig information.
+                    3. Ändra medlemskapstyp.
+                    0. Gå tillbaka.""");
             choice=Integer.parseInt(scanner.nextLine());
 
             switch (choice) {
                 case 1 -> showMemberInfo(Main.loggedInUser);
                 case 2 -> editMemberInfo(Main.loggedInUser);
                 case 3 -> changeMembershipType(Main.loggedInUser);
-                case 0: active = false;
+                case 0 -> active = false;
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
@@ -46,14 +47,14 @@ public class MemberController {
 
         while (active) {
             System.out.println("""
-                    What do you want to do?
-                    1. Show all members.
-                    2. Show all active members.
-                    3. Show all suspended members.
-                    4. Show all expired members.
-                    5. View specific member.
-                    6. Create new member account.
-                    0. Go back.""");
+                    Medlemsmeny
+                    1. Visa alla medlemmar.
+                    2. Visa alla aktiva medlemmar.
+                    3. Visa alla avstängda medlemmar.
+                    4. Visa alla avslutade medlemmar.
+                    5. Visa specifik medlem.
+                    6. Skapa nytt medlemskonto.
+                    0. Gå tillbaka.""");
             choice=IO.inputNumber();
 
             switch (choice) {
@@ -69,6 +70,7 @@ public class MemberController {
                 }
                 case 6 -> createMember();
                 case 0 -> active = false;
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
@@ -76,18 +78,18 @@ public class MemberController {
     public void showLibrarianMemberMenu(Member member){
         boolean active = true;
         while (active) {
-            System.out.println("You are viewing the account of " + member.getFullName());
+            System.out.println("Du tittar på kontot tillhörande " + member.getFullName());
             System.out.println("""
-                    What do you want to do?
-                    1. View membership information.
-                    2. Change personal information.
-                    3. Change membership type.
-                    4. Change membership status.
-                    5. View member's active loans.
-                    6. View all of member's loans.
-                    7. View member's unpaid fines.
-                    8. Pay/cancel member fine.
-                    0. Go back.""");
+                    Vänligen gör ett val:
+                    1. Visa medlemsinformation.
+                    2. Ändra personlig information.
+                    3. Ändra medlemskapstyp.
+                    4. Ändra medlemskapsstatus.
+                    5. Visa medlemmens aktiva lån.
+                    6. Visa alla medlemmens lån.
+                    7. Visa medlemmens obetalda böter.
+                    8. Betala en bot för medlemmen.
+                    0. Gå tillbaka.""");
             int choice = IO.inputNumber();
             switch (choice) {
                 case 1 -> showMemberInfo(member);
@@ -99,7 +101,7 @@ public class MemberController {
                 case 7 -> showUnpaidFines(member);
                 case 8 -> payFine(member);
                 case 0 -> active = false;
-                default -> System.out.println("Please enter a valid choice.");
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
@@ -107,9 +109,9 @@ public class MemberController {
     public void showAllMembers(){
         ArrayList<Member> members = memberService.getAllMembers();
         if(members.isEmpty()) {
-            System.out.println("There are no members.");
+            System.out.println("Det finns inga medlemmar.");
         } else {
-            System.out.println("ID | Name | Email | Status");
+            System.out.println("ID | Namn | E-post | Status");
             for (Member member : members) {
                 System.out.println(member.getMemberId() + " | " + member.getFullName() + " | " + member.getEmail() + " | " + member.getStatus());
             }
@@ -119,9 +121,9 @@ public class MemberController {
     public void showAllMembersByStatus(String status){
         ArrayList<Member> members = memberService.getAllMembersByStatus(status);
         if(members.isEmpty()) {
-            System.out.println("There are no "+status+" members.");
+            System.out.println("Det finns inga medlemmar med status  "+status+".");
         } else {
-            System.out.println("ID | Name | Email");
+            System.out.println("ID | Namn | E-post");
             for (Member member : members) {
                 System.out.println(member.getMemberId() + " | " + member.getFullName() + " | " + member.getEmail());
             }
@@ -129,12 +131,12 @@ public class MemberController {
     }
 
     public void showMemberInfo(Member member) {
-        System.out.println("First name: " + member.getFirstName());
-        System.out.println("Last name: " + member.getLastName());
-        System.out.println("E-mail address: " + member.getEmail());
-        System.out.println("Membership type: " + member.getMembershipType());
-        System.out.println("Membership status: " + member.getStatus());
-        System.out.println("Member since: " + member.getMembershipDate());
+        System.out.println("Förnamn: " + member.getFirstName());
+        System.out.println("Efternamn: " + member.getLastName());
+        System.out.println("E-postadress: " + member.getEmail());
+        System.out.println("Medlemskapstyp: " + member.getMembershipType());
+        System.out.println("Medlemskapsstatus: " + member.getStatus());
+        System.out.println("Medlem sedan: " + member.getMembershipDate());
 
     }
 
@@ -146,7 +148,7 @@ public class MemberController {
         Member member = new Member(firstName, lastName, email, status);
         try {
             memberService.addMember(member);
-            System.out.println("Member "+member.getFullName() + " created with ID "+member.getMemberId()+".");
+            System.out.println("Medlemmen "+member.getFullName() + " skapad med ID "+member.getMemberId()+".");
         } catch (CantCreateMemberException e) {
             System.out.println(e.getMessage());
         }
@@ -157,12 +159,12 @@ public class MemberController {
         int choice;
 
         while (active){
-            System.out.println("Which information do you want to edit?");
-            System.out.println("1. First name: " + member.getFirstName());
-            System.out.println("2. Last name: " + member.getLastName());
-            System.out.println("3. E-mail address: " + member.getEmail());
-            System.out.println("9. Save and exit.");
-            System.out.println("0. Exit without saving.");
+            System.out.println("Vilken information vill du redigera?");
+            System.out.println("1. Förnamn: " + member.getFirstName());
+            System.out.println("2. Efternamn: " + member.getLastName());
+            System.out.println("3. E-postadress: " + member.getEmail());
+            System.out.println("9. Spara och avsluta.");
+            System.out.println("0. Avsluta utan att spara.");
             choice=Integer.parseInt(scanner.nextLine());
 
             switch (choice) {
@@ -183,6 +185,7 @@ public class MemberController {
                     memberService.save(member);
                 }
                 case 0 -> active=false;
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
@@ -190,18 +193,18 @@ public class MemberController {
     public void changeMembershipStatus(Member member){
         boolean active = true;
         while (active) {
-            System.out.println("Current membership status is: " + member.getStatus());
-            System.out.println("Do you wish to change it to:");
-            if(!(member.getStatus()=="active")) {
-                System.out.println("1. Active.");
+            System.out.println("Nuvarande medlemsstatus är: " + member.getStatus());
+            System.out.println("Vill du ändra den till:");
+            if(!(member.getStatus().equals("active"))) {
+                System.out.println("1. Aktiv (active).");
             }
-            if(!(member.getStatus()=="suspended")) {
-                System.out.println("2. Suspended.");
+            if(!(member.getStatus().equals("suspended"))) {
+                System.out.println("2. Avstängd (suspended).");
             }
-            if(!(member.getStatus()=="expired")) {
-                System.out.println("3. Expired.");
+            if(!(member.getStatus().equals("expired"))) {
+                System.out.println("3. Avslutad (expired).");
             }
-            System.out.println("0. Go back.");
+            System.out.println("0. Gå tillbaka.");
             int choice = IO.inputNumber();
             switch (choice){
                 case 1 -> {
@@ -220,51 +223,51 @@ public class MemberController {
                     active = false;
                 }
                 case 0 -> active = false;
-                default -> System.out.println("Please enter a valid choice.");
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
 
     public void changeMembershipType(Member member) {
-        System.out.println("Current membership type is: " + member.getMembershipType());
+        System.out.println("Nuvarande medlemskapstyp är: " + member.getMembershipType());
         switch (member.getMembershipType()) {
             case "standard" -> {
                 boolean active = true;
                 while(active) {
-                    System.out.println("Do you wish to change it to premium (Y/N)?");
+                    System.out.println("Vill du ändra den till premium (J/N)?");
                     String choice = scanner.nextLine().trim();
                     switch (choice.toLowerCase()) {
-                        case "y", "yes" -> {
+                        case "j", "ja" -> {
                             member.setMembershipType("premium");
                             memberService.save(member);
-                            System.out.println("Membership type changed.");
+                            System.out.println("Medlemstyp ändrad.");
                             active = false;
                         }
-                        case "n", "no" -> {
-                            System.out.println("No changes made.");
+                        case "n", "nej" -> {
+                            System.out.println("Inga ändringar gjorda.");
                             active = false;
                         }
-                        default -> System.out.println("Not a valid choice.");
+                        default -> System.out.println("Vänligen ange ett giltigt val.");
                     }
                 }
             }
             case "premium" -> {
                 boolean active = true;
                 while(active) {
-                    System.out.println("Do you wish to change it to standard (Y/N)?");
+                    System.out.println("Vill du ändra den till standard (J/N)?");
                     String choice = scanner.nextLine().trim();
                     switch (choice.toLowerCase()) {
-                        case "y", "yes" -> {
+                        case "j", "ja" -> {
                             member.setMembershipType("standard");
                             memberService.save(member);
-                            System.out.println("Membership type changed.");
+                            System.out.println("Medlemstyp ändrad.");
                             active = false;
                         }
                         case "n", "no" -> {
-                            System.out.println("No changes made.");
+                            System.out.println("Inga ändringar gjorda.");
                             active = false;
                         }
-                        default -> System.out.println("Not a valid choice.");
+                        default -> System.out.println("Vänligen ange ett giltigt val.");
                     }
                 }
             }
@@ -275,9 +278,9 @@ public class MemberController {
         LoanService loanService = new LoanService();
         ArrayList<Loan> loans = loanService.getCurrentLoansByMember(member);
         if (loans.isEmpty()){
-            System.out.println(member.getFullName() + " has no current loans.");
+            System.out.println(member.getFullName() + " har inga nuvarande lån.");
         } else {
-            System.out.println("ID | Title | Due date");
+            System.out.println("ID | Titel | Förfallodatum");
             for(Loan loan : loans){
                 if(loan.isOverdue()){
                     System.out.println(ANSI.color("bright_red") + loan.getId() + " | " + loan.getBook().getTitle() + " | " + loan.getDueDate() + ANSI.reset());
@@ -292,14 +295,14 @@ public class MemberController {
         LoanService loanService = new LoanService();
         ArrayList<Loan> loans = loanService.getAllLoansByMember(member);
         if (loans.isEmpty()){
-            System.out.println(member.getFullName() + " has no loans.");
+            System.out.println(member.getFullName() + " har inga lån.");
         } else {
-            System.out.println("ID | Title | Due date | Return date");
+            System.out.println("ID | Titel | Förfallodatum | Återlämningsdatum");
             for(Loan loan : loans){
                 if(loan.isOverdue()){
                     System.out.println(ANSI.color("bright_red") + loan.getId() + " | " + loan.getBook().getTitle() + " | " + loan.getDueDate() + (loan.getReturnDate()==null ? "" : loan.getReturnDate()) + ANSI.reset());
                 } else {
-                    System.out.println(loan.getId() + " | " + loan.getBook().getTitle() + " | " + loan.getDueDate() + (loan.getReturnDate()==null ? "" : loan.getReturnDate()));
+                    System.out.println(loan.getId() + " | " + loan.getBook().getTitle() + " | " + loan.getDueDate() + " | " + (loan.getReturnDate()==null ? "" : loan.getReturnDate()));
                 }
             }
         }
@@ -309,9 +312,9 @@ public class MemberController {
         FineService fineService = new FineService();
         ArrayList<Fine> fines = fineService.getAllUnpaidFinesForMember(member);
         if(fines.isEmpty()){
-            System.out.println(member.getFullName() + " has no unpaid fines.");
+            System.out.println(member.getFullName() + " har inga obetalda böter.");
         } else {
-            System.out.println("ID | Title | Amount | Issued");
+            System.out.println("ID | Titel | Belopp | Utfärdad");
             for(Fine fine : fines) {
                 System.out.println(fine.getId() + " | " + fine.getLoan().getBook().getTitle() + " | " + fine.getAmount() + " kr | " + fine.getIssuedDate());
             }
@@ -322,7 +325,7 @@ public class MemberController {
         FineService fineService = new FineService();
         boolean active = true;
         while (active) {
-            System.out.println("Please enter fine ID (or 0 to go back):");
+            System.out.println("Vänligen ange bot-ID (eller 0 för att gå tillbaka):");
             int id = IO.inputNumber();
             if (id == 0){
                 active = false;
@@ -333,11 +336,11 @@ public class MemberController {
                         fineService.payFine(fine);
                         active = false;
                     } else {
-                        System.out.println("Fine " + id + " does not belong to " + member.getFullName() +".");
+                        System.out.println("Bot " + id + " hör inte till " + member.getFullName() +".");
                     }
 
                 } else {
-                    System.out.println("Could not find fine ID.");
+                    System.out.println("Kunde inte hitta någon bot med det ID:t.");
                 }
             }
         }
@@ -347,12 +350,12 @@ public class MemberController {
         boolean active = true;
         String firstName = "";
         while (active) {
-            System.out.println("Please enter the member's first name.");
+            System.out.println("Vänligen ange medlemmens förnamn.");
             firstName = scanner.nextLine().trim();
-            if(firstName.length()>0) {
-                active=false;
+            if(firstName.isEmpty()) {
+                System.out.println("Namnet får inte vara tomt.");
             } else {
-                System.out.println("Can't accept an empty name.");
+                active=false;
             }
         }
         return firstName;
@@ -362,12 +365,12 @@ public class MemberController {
         boolean active = true;
         String lastName = "";
         while (active) {
-            System.out.println("Please enter the member's last name.");
+            System.out.println("Vänligen ange medlemmens efternamn.");
             lastName = scanner.nextLine().trim();
-            if(lastName.length()>0) {
-                active=false;
+            if(lastName.isEmpty()) {
+                System.out.println("Namnet får inte vara tomt.");
             } else {
-                System.out.println("Can't accept an empty name.");
+                active=false;
             }
         }
         return lastName;
@@ -378,12 +381,12 @@ public class MemberController {
         String newMail ="";
         EmailValidator emailValidator = EmailValidator.getInstance();
         while(active) {
-            System.out.println("Please enter new email address:");
+            System.out.println("Vänligen ange e-postadress:");
             newMail = scanner.nextLine().trim();
             if (emailValidator.isValid(newMail)) {
                 active = false;
             } else {
-                System.out.println("The email address " +newMail+ " is not valid.");
+                System.out.println("E-postadressen " +newMail+ " är inte giltig.");
             }
         }
         return newMail;
@@ -393,12 +396,12 @@ public class MemberController {
         boolean active = true;
         String status = "";
         while (active) {
-            System.out.println("Please enter member status (standard or premium).");
+            System.out.println("Vänligen ange medlemsstatus (standard eller premium).");
             status = scanner.nextLine().trim().toLowerCase();
-            if(!(status=="standard"||status=="premium")) {
+            if(!(status.equals("standard")||status.equals("premium"))) {
                 active=false;
             } else {
-                System.out.println("Not a valid value.");
+                System.out.println("Vänligen ange ett giltigt värde.");
             }
         }
         return status;
@@ -410,7 +413,7 @@ public class MemberController {
         MemberService memberService = new MemberService();
         EmailValidator emailValidator = EmailValidator.getInstance();
         while(active){
-            System.out.println("Please enter member ID or e-mail address (or 0 to go back):");
+            System.out.println("Vänligen ange medlemmens ID eller e-postadress (eller 0 för att gå tillbaka):");
             String input=scanner.nextLine().trim();
 
             if (IO.isNumeric (input)){
@@ -419,18 +422,18 @@ public class MemberController {
                     user = memberService.getById(Integer.parseInt(input));
                     active = false;
                 } else {
-                    System.out.println("Member " + input + " could not be found.");
+                    System.out.println("Kunde inte hitta medlem " + input + ".");
                 }
             } else if (emailValidator.isValid(input)) {
                 try {
                     user = memberService.getByEmail(input);
                     active=false;
                 } catch (MemberNotFoundException e) {
-                    System.out.println("Could not find any member with the email "+input + ".");
+                    System.out.println("Kunde inte hitta någon medlem med e-postadressen "+input + ".");
                 }
 
             } else {
-                System.out.println("Invalid ID or e-mail address.");
+                System.out.println("Ogiltigt ID eller e-postadress.");
             }
         }
         return user;

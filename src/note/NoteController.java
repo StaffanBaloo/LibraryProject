@@ -1,7 +1,8 @@
 package note;
 
-import loan.LoanService;
-import Main;
+import member.Member;
+import prime.IO;
+import prime.Main;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -18,100 +19,98 @@ public class NoteController {
         boolean active = true;
         int unreadNotes;
         while (active){
-            System.out.println("Notifications menu");
+            System.out.println("Meddelandemeny");
             unreadNotes = noteService.getNumberUnreadNotesByMember(Main.loggedInUser);
             if(unreadNotes>0){
-                System.out.println("You have "+unreadNotes+ " unread notifications.");
+                System.out.println("Du har "+unreadNotes+ " olästa meddelanden.");
             }
             System.out.println("""
-                    1. Read oldest unread notification.
-                    2. Read specific notification.
-                    3. List unread notifications.
-                    4. List all notifications.
-                    0. Back.""");
+                    1. Läs det äldsta olästa meddelandet.
+                    2. Läs ett specifikt meddelande.
+                    3. Visa olästa meddelanden.
+                    4. Visa alla meddelanden.
+                    0. Gå tillbaka.""");
             int choice=Integer.parseInt(scanner.nextLine());
             switch (choice) {
-                case 1: {
-                    readOldestUnread();
-                    break;
-                }
-                case 2: {
-                    read();
-                    break;
-                }
-                case 3: {
-                    listUnread();
-                    break;
-                }
-                case 4: {
-                    listAll();
-                    break;
-                }
-                case 0: {
-                    active=false;
-                    break;
-                }
+                case 1 -> readOldestUnread(Main.loggedInUser);
+                case 2 -> read(Main.loggedInUser);
+                case 3 -> listUnread(Main.loggedInUser);
+                case 4 -> listAll(Main.loggedInUser);
+                case 0 -> active=false;
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
 
-    void readOldestUnread(){
-        Note note = noteService.getOldestUnreadByMember(Main.loggedInUser);
-        System.out.println("Notification type: " + note.getType() +".");
-        System.out.println("Sent on: " + note.getSentDate() +".");
-        if(!Objects.isNull(note.getLoan())) {
-            System.out.println("Applies to:");
-            System.out.println(note.getLoan().toString());
+    void readOldestUnread(Member member){
+        if(noteService.getNumberUnreadNotesByMember(member)==0){
+            System.out.println("Du har inga olästa meddelanden.");
+        } else {
+            Note note = noteService.getOldestUnreadByMember(member);
+            System.out.println("Meddelandetyp: " + note.getType() + ".");
+            System.out.println("Skickat: " + note.getSentDate() + ".");
+            if (!Objects.isNull(note.getLoan())) {
+                System.out.println("Gäller:");
+                System.out.println(note.getLoan().toString());
+            }
+            System.out.println("Meddelande:");
+            System.out.println(note.getMessage());
+            noteService.markRead(note);
         }
-        System.out.println("Message:");
-        System.out.println(note.getMessage());
-        noteService.markRead(note);
     }
 
-    void read(){
+    void read(Member member){
         boolean active = true;
-        while (active) {
-            System.out.println("Please enter notification ID:");
-            int noteId=Integer.parseInt(scanner.nextLine().trim());
-            Note note = noteService.getNote(noteId);
-            if (note.getMember().getMemberId() == Main.loggedInUser.getMemberId()) {
-                System.out.println("Notification type: " + note.getType() +".");
-                System.out.println("Sent on: " + note.getSentDate() +".");
-                if(!Objects.isNull(note.getLoan())) {
-                    System.out.println("Applies to:");
-                    System.out.println(note.getLoan().toString());
-                }
-                System.out.println("Message:");
-                System.out.println(note.getMessage());
-                noteService.markRead(note);
-                active=false;
-            } else {
-                System.out.println("That notification is not yours!");
+        if(noteService.getNumberNotesByMember(member)>0) {
+            while (active) {
+                System.out.println("Vänligen ange meddelande-ID (eller 0 för att gå tillbaka)");
+                int noteId = IO.inputNumber();
+                if (noteId > 0) {
+                    Note note = noteService.getNote(noteId);
+                    if (note.getNoteId() == 0) {
+                        System.out.println("Kunde inte hitta meddelande " + noteId + ".");
+                    } else {
+                        if (note.getMember().getMemberId() == member.getMemberId()) {
+                            System.out.println("Meddelandetyp: " + note.getType() + ".");
+                            System.out.println("Skickat: " + note.getSentDate() + ".");
+                            if (!Objects.isNull(note.getLoan())) {
+                                System.out.println("Gäller:");
+                                System.out.println(note.getLoan().toString());
+                            }
+                            System.out.println("Meddelande:");
+                            System.out.println(note.getMessage());
+                            noteService.markRead(note);
+                            active = false;
+                        } else {
+                            System.out.println("Det meddelandet är inte till dig.");
+                        }
+                    }
+                } else active = false;
             }
-        }
+        } else System.out.println("Du har inga meddelanden.");
     }
 
-    void listUnread(){
-        if(noteService.getNumberUnreadNotesByMember(Main.loggedInUser)>0){
-            System.out.println("You have the following unread notifications:");
-            ArrayList<Note> notes = noteService.getUnreadNotesByMember(Main.loggedInUser);
+    void listUnread(Member member){
+        if(noteService.getNumberUnreadNotesByMember(member)>0){
+            System.out.println("Du har följande olästa meddelanden:");
+            ArrayList<Note> notes = noteService.getUnreadNotesByMember(member);
             for (Note note: notes) {
                 System.out.println(note.toString());
             }
         }else {
-            System.out.println("You do not have any unread notifications.");
+            System.out.println("Du har inga olästa meddelanden.");
         }
     }
 
-    void listAll(){
-        if(noteService.getNumberNotesByMember(Main.loggedInUser)>0){
-            System.out.println("You have the following  notifications:");
-            ArrayList<Note> notes = noteService.getNotesByMember(Main.loggedInUser);
+    void listAll(Member member){
+        if(noteService.getNumberNotesByMember(member)>0){
+            System.out.println("Du har följande meddelanden:");
+            ArrayList<Note> notes = noteService.getNotesByMember(member);
             for (Note note: notes) {
                 System.out.println(note.toString());
             }
         }else {
-            System.out.println("You do not have any notifications.");
+            System.out.println("Du har inga meddelanden.");
         }
     }
 }

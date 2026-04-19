@@ -1,6 +1,7 @@
 package note;
 
-import Repository;
+import prime.DateConverter;
+import prime.Repository;
 import book.Book;
 import exceptions.*;
 import loan.Loan;
@@ -16,7 +17,7 @@ public class NoteRepository extends Repository {
     }
 
     public Note getNoteById(int noteId){
-        Note note;
+        Note note = new Note();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
                 SELECT *, m.*, l.*,b.*
@@ -28,7 +29,7 @@ public class NoteRepository extends Repository {
             """)) {
             stmt.setInt(1, noteId);
             ResultSet rs =stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 note = mapRow(rs);
             }
 
@@ -47,11 +48,11 @@ public class NoteRepository extends Repository {
                 JOIN members m on n.member_id = m.id
                 JOIN loans l on n.loan_id = l.id
                 JOIN books b on l.book_id = b.id
-                WHERE n.id = ?
+                WHERE n.member_id = ?
             """)) {
             stmt.setInt(1, member.getMemberId());
             ResultSet rs =stmt.executeQuery();
-            while(rs.first()){
+            while(rs.next()){
                 notes.add(mapRow(rs));
             }
 
@@ -62,7 +63,7 @@ public class NoteRepository extends Repository {
     }
 
     public Note getOldestUnreadByMember(Member member){
-        Note note;
+        Note note = new Note();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
                 SELECT *, m.*, l.*,b.*
@@ -75,8 +76,10 @@ public class NoteRepository extends Repository {
                 LIMIT 1;""")) {
             stmt.setInt(1, member.getMemberId());
             ResultSet rs =stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 note = mapRow(rs);
+            } else {
+                note=null;
             }
 
         } catch (SQLException e) {
@@ -97,11 +100,11 @@ public class NoteRepository extends Repository {
             stmt.setString(4, note.getMessage());
             stmt.setDate(5, Date.valueOf(note.getSentDate()));
             stmt.setBoolean(6, note.isRead());
-            ResultSet insertSet = stmt.getGeneratedKeys();
             int insertRowCount = stmt.executeUpdate();
+            ResultSet insertSet = stmt.getGeneratedKeys();
             if(insertRowCount>0){
                 if(insertSet.next()){
-                    int newNoteId=insertSet.getInt("id");
+                    int newNoteId=insertSet.getInt(1);
                     note.setNoteId(newNoteId);
                 }
             } else {
@@ -121,7 +124,7 @@ public class NoteRepository extends Repository {
             """)) {
             stmt.setInt(1, member.getMemberId());
             ResultSet rs =stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 return rs.getInt("number");
             }
 
@@ -140,7 +143,7 @@ public class NoteRepository extends Repository {
             """)) {
             stmt.setInt(1, member.getMemberId());
             ResultSet rs =stmt.executeQuery();
-            if(rs.first()){
+            if(rs.next()){
                 return rs.getInt("number");
             }
 
@@ -177,7 +180,7 @@ public class NoteRepository extends Repository {
     }
 
     private Note mapRow(ResultSet rs) {
-        Note note;
+        Note note = new Note();
         try {
             note = new Note(rs.getInt("id"),
                     new Member(rs.getInt("m.id"),
@@ -186,7 +189,7 @@ public class NoteRepository extends Repository {
                             rs.getString("m.email"),
                             rs.getString("m.membership_type"),
                             rs.getString("m.status"),
-                            rs.getDate("m.membership_date").toLocalDate()),
+                            DateConverter.toLocalDate(rs.getDate("m.membership_date"))),
                     new Loan(rs.getInt("l.id"),
                             new Book(rs.getInt("b.id"),
                                     rs.getString("b.title"),
@@ -200,13 +203,13 @@ public class NoteRepository extends Repository {
                                     rs.getString("m.email"),
                                     rs.getString("m.membership_type"),
                                     rs.getString("m.status"),
-                                    rs.getDate("m.membership_date").toLocalDate()),
-                            rs.getDate("l.loan_date").toLocalDate(),
-                            rs.getDate("l.due_date").toLocalDate(),
-                            rs.getDate("l.return_date").toLocalDate()),
+                                    DateConverter.toLocalDate(rs.getDate("m.membership_date"))),
+                            DateConverter.toLocalDate(rs.getDate("l.loan_date")),
+                            DateConverter.toLocalDate(rs.getDate("l.due_date")),
+                            DateConverter.toLocalDate(rs.getDate("l.return_date"))),
                             rs.getString("n.type"),
                             rs.getString("n.message"),
-                            rs.getDate("n.sent_date").toLocalDate(),
+                            DateConverter.toLocalDate(rs.getDate("n.sent_date")),
                             rs.getBoolean("n.is_read"));
         }catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());

@@ -1,12 +1,12 @@
+package prime;
+
 import author.AuthorController;
 import book.BookController;
-import exceptions.*;
 import loan.Loan;
 import loan.LoanController;
 import loan.LoanService;
 import member.MemberController;
 import category.CategoryController;
-import Rules;
 import member.MemberService;
 import note.NoteService;
 import java.time.LocalDate;
@@ -23,14 +23,14 @@ public class LibrarianController {
         int choice;
         while(active) {
             System.out.println("""
-                    Welcome, librarian!
-                    1. Book menu.
-                    2. Author menu.
-                    3. Category menu.
-                    4. Member menu.
-                    5. Loans menu.
-                    6. Run maintenance.
-                    0. Go back""");
+                    Welcome, bibliotekarie!
+                    1. Bokmeny.
+                    2. Författarmeny.
+                    3. Kategorimeny.
+                    4. Medlemsmeny.
+                    5. Lånemeny.
+                    6. Kör underhåll.
+                    0. Gå tillbaka.""");
             choice=Integer.parseInt(scanner.nextLine());
             switch (choice) {
                 case 1 -> {
@@ -55,6 +55,7 @@ public class LibrarianController {
                 }
                 case 6 -> runMaintenance();
                 case 0 -> active=false;
+                default -> System.out.println("Vänligen ange ett giltigt val.");
             }
         }
     }
@@ -80,7 +81,7 @@ public class LibrarianController {
                 reminders++;
             }
         }
-        System.out.println("Sent out "+suspensions+" suspensions, "+overdue+" overdue warnings, and "+reminders+" reminders.");
+        System.out.println("Skickade "+suspensions+" avstängningar, "+overdue+" förfallovarningar, och "+reminders+" påminnelser.");
 
     }
 

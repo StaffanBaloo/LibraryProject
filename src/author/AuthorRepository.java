@@ -1,6 +1,7 @@
 package author;
 
-import Repository;
+import prime.DateConverter;
+import prime.Repository;
 import exceptions.CantDeleteAuthorException;
 import exceptions.CantSaveAuthorException;
 
@@ -93,7 +94,7 @@ public class AuthorRepository extends Repository {
             """)) {
             stmt.setInt(1,authorId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
+            if (rs.next()) {
                 if(rs.getInt("number")>0) {
                     exists = true;
                 }
@@ -110,7 +111,7 @@ public class AuthorRepository extends Repository {
              PreparedStatement insertAuthor = conn.prepareStatement("""
                 INSERT INTO authors
                     (first_name, last_name, nationality, birth_date)
-                    VALUES (?, ?, ?, ?);""");
+                    VALUES (?, ?, ?, ?);""", Statement.RETURN_GENERATED_KEYS);
              PreparedStatement insertDescription = conn.prepareStatement("""
                 INSERT INTO author_descriptions
                     (author_id, biography, website)
@@ -121,11 +122,11 @@ public class AuthorRepository extends Repository {
                 insertAuthor.setString(2, author.getLastName());
                 insertAuthor.setString(3, author.getNationality());
                 insertAuthor.setDate(4, Date.valueOf(author.getBirthDate()));
-                ResultSet insertSet = insertAuthor.getGeneratedKeys();
                 int insertRowCount = insertAuthor.executeUpdate();
+                ResultSet insertSet = insertAuthor.getGeneratedKeys();
                 if (insertRowCount > 0) {
                     if (insertSet.next()) {
-                        newAuthorId = insertSet.getInt("id");
+                        newAuthorId = insertSet.getInt(1);
                         author.setId(newAuthorId);
                         insertDescription.setInt(1, newAuthorId);
                         insertDescription.setString(2, author.getBiography());
@@ -234,7 +235,7 @@ public class AuthorRepository extends Repository {
                     rs.getString("first_name"),
                     rs.getString("last_name"),
                     rs.getString("nationality"),
-                    rs.getDate("birth_date").toLocalDate(),
+                    DateConverter.toLocalDate(rs.getDate("birth_date")),
                     rs.getString("ad.biography"),
                     rs.getString("ad.website"));
         }catch (SQLException e) {
