@@ -398,7 +398,7 @@ public class MemberController {
         while (active) {
             System.out.println("Vänligen ange medlemsstatus (standard eller premium).");
             status = scanner.nextLine().trim().toLowerCase();
-            if(!(status.equals("standard")||status.equals("premium"))) {
+            if((status.equals("standard")||status.equals("premium"))) {
                 active=false;
             } else {
                 System.out.println("Vänligen ange ett giltigt värde.");
