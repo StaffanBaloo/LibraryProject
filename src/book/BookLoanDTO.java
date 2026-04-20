@@ -1,12 +1,13 @@
 package book;
 
 public class BookLoanDTO {
-    private int bookId;
+    private int bookId, availableCopies;
     private String title;
 
-    public BookLoanDTO(int bookId, String title) {
+    public BookLoanDTO(int bookId, String title, int availableCopies) {
         this.bookId = bookId;
         this.title = title;
+        this.availableCopies = availableCopies;
     }
 
     public int getBookId() {
@@ -25,7 +26,12 @@ public class BookLoanDTO {
         this.title = title;
     }
 
-    public static BookLoanDTO mapToBookLoanDTO(Book book) {
-        return new BookLoanDTO(book.getBookId(), book.getTitle());
+    public int getAvailableCopies() {
+        return availableCopies;
     }
+
+    public void setAvailableCopies(int availableCopies) {
+        this.availableCopies = availableCopies;
+    }
+
 }

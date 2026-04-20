@@ -34,8 +34,9 @@ public class BookController {
                     4. Sök böcker på titel.
                     5. Sök böcker på kategori.
                     6. Sök böcker på nyckelord.
-                    7. Visa detaljerad bokinformation på ID.
-                    8. Låna bok.
+                    7. Visa top 10 senaste året.
+                    8. Visa detaljerad bokinformation på ID.
+                    9. Låna bok.
                     0. Gå tillbaka.""");
             int choice=IO.inputNumber();
             switch (choice) {
@@ -45,8 +46,12 @@ public class BookController {
                 case 4 -> findByTitle();
                 case 5 -> findByCategory();
                 case 6 -> findByKeyword();
-                case 7 -> showDetailedInfo();
-                case 8 -> borrowBook();
+                case 7 -> {
+                    LoanController loanController = new LoanController();
+                    loanController.showTopList(10, LocalDate.now().minusYears(1), LocalDate.now());
+                }
+                case 8 -> showDetailedInfo();
+                case 9 -> borrowBook();
                 case 0 -> active = false;
                 default -> System.out.println("Vänligen ange ett giltigt val.");
             }

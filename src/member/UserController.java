@@ -55,7 +55,7 @@ public class UserController {
                     1. Böcker.
                     2. Lån.
                     3. Profil (meddelanden och böter).
-                    0. Go back and log out.""");
+                    0. Gå tillbaka och logga ut.""");
             choice=Integer.parseInt(scanner.nextLine());
             switch (choice) {
                 case 1 -> {

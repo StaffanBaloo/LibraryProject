@@ -295,7 +295,7 @@ public class LoanRepository extends Repository {
             stmt.setInt(3, length);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                titles.add("b.title");
+                titles.add(rs.getString("b.title"));
             }
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());

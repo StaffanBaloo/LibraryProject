@@ -34,12 +34,12 @@ public class AuthorService {
 
     public ArrayList<BookListDTO> getBooksByAuthorId(int authorId) {
         ArrayList<Book> bookList = bookService.getBooksByAuthorId(authorId);
-        return BookMapper.mapToDTOs(bookList);
+        return BookMapper.mapToListDTOs(bookList);
     }
 
     public ArrayList<BookListDTO> getBooksByAuthorName(String searchTerm) {
         ArrayList<Book> bookList = bookService.getBooksByAuthorName(searchTerm);
-        return BookMapper.mapToDTOs(bookList);
+        return BookMapper.mapToListDTOs(bookList);
     }
 
     public void delete(Author author) {

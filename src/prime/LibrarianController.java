@@ -31,7 +31,7 @@ public class LibrarianController {
                     5. Lånemeny.
                     6. Kör underhåll.
                     0. Gå tillbaka.""");
-            choice=Integer.parseInt(scanner.nextLine());
+            choice=IO.inputNumber();
             switch (choice) {
                 case 1 -> {
                     BookController BookController = new BookController();

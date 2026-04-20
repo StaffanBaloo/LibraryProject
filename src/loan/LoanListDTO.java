@@ -1,54 +1,24 @@
 package loan;
 
-import book.*;
+import book.Book;
+import book.BookLoanDTO;
 import member.Member;
 
 import java.time.LocalDate;
 
-public class Loan {
+public class LoanListDTO {
     private int id;
-    Book book;
+    BookLoanDTO book;
     Member member;
     private LocalDate loanDate, dueDate, returnDate;
 
-    public Loan(int id, Book book, Member member, LocalDate loanDate, LocalDate dueDate) {
-        this.id = id;
-        this.book = book;
-        this.member = member;
-        this.loanDate = loanDate;
-        this.dueDate = dueDate;
-    }
-
-    public Loan(Book book, Member member, LocalDate loanDate, LocalDate dueDate) {
-        this.book = book;
-        this.member = member;
-        this.loanDate = loanDate;
-        this.dueDate = dueDate;
-    }
-
-    public Loan(int id, LocalDate loanDate, LocalDate dueDate, LocalDate returnDate) {
-        this.id = id;
-        this.loanDate = loanDate;
-        this.dueDate = dueDate;
-        this.returnDate = returnDate;
-    }
-
-    public Loan(int id, Book book, Member member, LocalDate loanDate, LocalDate dueDate, LocalDate returnDate) {
+    public LoanListDTO(int id, BookLoanDTO book, Member member, LocalDate loanDate, LocalDate dueDate, LocalDate returnDate) {
         this.id = id;
         this.book = book;
         this.member = member;
         this.loanDate = loanDate;
         this.dueDate = dueDate;
         this.returnDate = returnDate;
-    }
-
-    public Loan() {
-        this.id = 0;
-        this.book = new Book();
-        this.member = new Member();
-        this.loanDate = LocalDate.of(1,1,1);
-        this.dueDate = LocalDate.of(1,1,1);
-        this.returnDate = LocalDate.of(1,1,1);
     }
 
     public int getId() {
@@ -59,11 +29,11 @@ public class Loan {
         this.id = id;
     }
 
-    public Book getBook() {
+    public BookLoanDTO getBook() {
         return book;
     }
 
-    public void setBook(Book book) {
+    public void setBook(BookLoanDTO book) {
         this.book = book;
     }
 
@@ -100,7 +70,7 @@ public class Loan {
     }
 
     public boolean isOverdue(){
-        return (LocalDate.now().isAfter(this.dueDate) && this.returnDate == null);
+        return (LocalDate.now().isBefore(this.dueDate) && this.returnDate == null);
     }
 
     @Override

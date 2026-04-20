@@ -24,7 +24,10 @@ public class MainController {
             System.out.println("0. Avsluta");
             int choice=Integer.parseInt(scanner.nextLine());
             switch (choice) {
-                case 1 -> IO.NYI();
+                case 1 -> {
+                    GuestController guestController = new GuestController();
+                    guestController.showMenu();
+                }
                 case 2 -> {
                     login();
                     UserController userController = new UserController();
@@ -50,12 +53,16 @@ public class MainController {
             String input=scanner.nextLine().trim();
 
             if (IO.isNumeric (input)){
-                try {
-                    user = memberService.getById(Integer.parseInt(input));
+                if(input.equals("0")) {
                     active = false;
-                    Main.login(user);
-                } catch (MemberNotFoundException e) {
-                    System.out.println("Kunde inte hitta medlem " + input + ".");
+                } else {
+                    try {
+                        user = memberService.getById(Integer.parseInt(input));
+                        active = false;
+                        Main.login(user);
+                    } catch (MemberNotFoundException e) {
+                        System.out.println("Kunde inte hitta medlem " + input + ".");
+                    }
                 }
             } else if (emailValidator.isValid(input)) {
                 try {

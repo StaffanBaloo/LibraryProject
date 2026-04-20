@@ -1,6 +1,6 @@
 package loan;
 import book.Book;
-import exceptions.LoanCreationException;
+import exceptions.CantCreateLoanException;
 import exceptions.LoanRenewException;
 import exceptions.LoanReturnException;
 import fine.FineService;
@@ -120,10 +120,10 @@ public class LoanService {
                 loan = new Loan (book, member, LocalDate.now(), newDueDate());
                 loan.setId(loanRepository.createLoan(loan));
             } else {
-                throw(new LoanCreationException("No copies of book " + book.getBookId() + ": " + book.getTitle()+ " available."));
+                throw(new CantCreateLoanException("No copies of book " + book.getBookId() + ": " + book.getTitle()+ " available."));
             }
         } else {
-            throw(new LoanCreationException("Membership status is " + member.getStatus() +"."));
+            throw(new CantCreateLoanException("Membership status is " + member.getStatus() +"."));
         }
         return loan;
     }
