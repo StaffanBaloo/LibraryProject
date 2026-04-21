@@ -37,6 +37,7 @@ public class BookController {
                     7. Visa top 10 senaste året.
                     8. Visa detaljerad bokinformation på ID.
                     9. Låna bok.
+                    10. Visa alla kategorier.
                     0. Gå tillbaka.""");
             int choice=IO.inputNumber();
             switch (choice) {
@@ -52,6 +53,10 @@ public class BookController {
                 }
                 case 8 -> showDetailedInfo();
                 case 9 -> borrowBook();
+                case 10 -> {
+                    var categoryController = new CategoryController();
+                    categoryController.showAllCategories();
+                }
                 case 0 -> active = false;
                 default -> System.out.println("Vänligen ange ett giltigt val.");
             }
@@ -74,6 +79,7 @@ public class BookController {
                     8. Lägg till bok.
                     9. Redigera bok.
                     10. Ta bort bok.
+                    11. Visa alla kategorier.
                     0. Gå tillbaka.""");
             choice = IO.inputNumber();
             switch (choice) {
@@ -87,6 +93,10 @@ public class BookController {
                 case 8 -> addBook();
                 case 9 -> editBook();
                 case 10 -> deleteBook();
+                case 11 -> {
+                    var categoryController = new CategoryController();
+                    categoryController.showAllCategories();
+                }
                 case 0 -> active = false;
                 default -> System.out.println("Vänligen ange ett giltigt val.");
             }

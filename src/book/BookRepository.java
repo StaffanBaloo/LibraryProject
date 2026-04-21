@@ -30,7 +30,7 @@ public class BookRepository extends Repository {
 
             // rs.next() går till nästa rad — returnerar false när det inte finns fler
             while(rs.next()) {
-                books.add(mapRow(rs));
+                books.add(mapListRow(rs));
 
             }
 
@@ -55,7 +55,7 @@ public class BookRepository extends Repository {
 
             // rs.next() går till nästa rad — returnerar false när det inte finns fler
             while(rs.next()) {
-                books.add(mapRow(rs));
+                books.add(mapListRow(rs));
 
             }
 
@@ -77,7 +77,7 @@ public class BookRepository extends Repository {
             stmt.setString(1, "%"+searchTerm+"%");
             ResultSet rs =stmt.executeQuery();
             while(rs.next()) {
-                books.add(mapRow(rs));
+                books.add(mapListRow(rs));
             }
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());
@@ -98,7 +98,7 @@ public class BookRepository extends Repository {
             stmt.setInt(1, authorId);
             ResultSet rs =stmt.executeQuery();
             while(rs.next()) {
-                books.add(mapRow(rs));
+                books.add(mapListRow(rs));
             }
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());
@@ -121,7 +121,7 @@ public class BookRepository extends Repository {
             stmt.setString(2, "%"+searchTerm+"%");
             ResultSet rs =stmt.executeQuery();
             while(rs.next()) {
-                books.add(mapRow(rs));
+                books.add(mapListRow(rs));
             }
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());
@@ -142,7 +142,7 @@ public class BookRepository extends Repository {
             stmt.setInt(1, categoryId);
             ResultSet rs =stmt.executeQuery();
             while(rs.next()) {
-                books.add(mapRow(rs));
+                books.add(mapListRow(rs));
             }
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());
@@ -164,7 +164,7 @@ public class BookRepository extends Repository {
             stmt.setString(1, "%"+searchTerm+"%");
             ResultSet rs =stmt.executeQuery();
             while(rs.next()) {
-                books.add(mapRow(rs));
+                books.add(mapListRow(rs));
             }
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());
@@ -184,7 +184,7 @@ public class BookRepository extends Repository {
             stmt.setString(1, "%"+searchTerm+"%");
             ResultSet rs =stmt.executeQuery();
             while(rs.next()) {
-                books.add(mapRow(rs));
+                books.add(mapListRow(rs));
             }
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());
@@ -201,7 +201,7 @@ public class BookRepository extends Repository {
             stmt.setInt(1, bookId);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
-                return mapRow(rs);
+                return mapSingleRow(rs);
             }
             else {
                 return null;
@@ -210,6 +210,36 @@ public class BookRepository extends Repository {
             System.out.println("Fel: " + e.getMessage());
         }
         return null;
+    }
+
+    public ArrayList<BookAuthor> getBookAuthors(){
+        ArrayList<BookAuthor> bookAuthors = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement("SELECT * from book_authors;")){
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()) {
+                bookAuthors.add(new BookAuthor(rs.getInt("book_id"),
+                        rs.getInt("author_id")));
+            }
+        }catch (SQLException e) {
+            System.out.println("Fel: " + e.getMessage());
+        }
+        return bookAuthors;
+    }
+
+    public ArrayList<BookCategory> getBookCategories(){
+        ArrayList<BookCategory> bookCategories = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement("SELECT * from book_categories;")){
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()) {
+                bookCategories.add(new BookCategory(rs.getInt("book_id"),
+                        rs.getInt("category_id")));
+            }
+        }catch (SQLException e) {
+            System.out.println("Fel: " + e.getMessage());
+        }
+        return bookCategories;
     }
 
     public Book getBookByLoanId(int loanId) {
@@ -222,7 +252,7 @@ public class BookRepository extends Repository {
             stmt.setInt(1, loanId);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
-                return mapRow(rs);
+                return mapSingleRow(rs);
             }
             else {
                 return null;
@@ -410,7 +440,24 @@ public class BookRepository extends Repository {
         }
     }
 
-    private Book mapRow(ResultSet rs) {
+    private Book mapListRow(ResultSet rs) {
+        try {
+            return new Book(rs.getInt("b.id"),
+                    rs.getString("b.title"),
+                    rs.getString("b.isbn"),
+                    rs.getInt("b.year_published"),
+                    rs.getInt("b.total_copies"),
+                    rs.getInt("b.available_copies"),
+                    rs.getString("bd.summary"),
+                    rs.getInt("bd.page_count"),
+                    rs.getString("bd.language"));
+        } catch (SQLException e) {
+            System.out.println("Fel: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private Book mapSingleRow(ResultSet rs) {
         AuthorRepository authorRepository = new AuthorRepository();
         CategoryRepository categoryRepository = new CategoryRepository();
         try {

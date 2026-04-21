@@ -1,6 +1,7 @@
 package prime;
 
 import book.BookController;
+import category.CategoryController;
 import loan.LoanController;
 
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class GuestController {
                     6. Sök böcker på nyckelord.
                     7. Visa top 10 senaste året.
                     8. Visa detaljerad bokinformation på ID.
+                    9. Visa alla kategorier.
                     0. Gå tillbaka.""");
             choice=IO.inputNumber();
             switch (choice) {
@@ -39,6 +41,10 @@ public class GuestController {
                     loanController.showTopList(10, LocalDate.now().minusYears(1), LocalDate.now());
                 }
                 case 8 -> bookController.showDetailedInfo();
+                case 9 ->{
+                    var categoryController = new CategoryController();
+                    categoryController.showAllCategories();
+                }
                 case 0 -> active = false;
                 default -> System.out.println("Vänligen ange ett giltigt val.");
             }

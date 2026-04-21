@@ -6,6 +6,7 @@ import exceptions.*;
 import loan.LoanRepository;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class BookService {
 
@@ -18,7 +19,35 @@ public class BookService {
 
     public ArrayList<Book> getAllBooks(){
         ArrayList<Book> books = bookRepository.getAllBooks();
+        matchWithAuthorsCategories(books);
         return books;
+    }
+
+    public void matchWithAuthorsCategories(ArrayList<Book> books){
+        var authors = authorRepository.getAllAuthors();
+        var categories = categoryRepository.getAllCategories();
+        var bookAuthors = bookRepository.getBookAuthors();
+        var bookCategories = bookRepository.getBookCategories();
+        var authorMap = authors.stream()
+                .collect(Collectors.toMap(Author::getId, author-> author));
+        var categoryMap = categories.stream()
+                .collect(Collectors.toMap(Category::getId, category -> category));
+        var bookMap = books.stream()
+                .collect(Collectors.toMap(Book::getBookId, book->book));
+        for (BookAuthor ba : bookAuthors){
+            Book book = bookMap.get(ba.getBookId());
+            Author author = authorMap.get(ba.getAuthorId());
+            if(book!=null && author!= null){
+                book.getAuthors().add(author);
+            }
+        }
+        for (BookCategory bc : bookCategories){
+            Book book = bookMap.get(bc.getBookId());
+            Category category = categoryMap.get(bc.getCategoryId());
+            if(book!=null && category!= null){
+                book.getCategories().add(category);
+            }
+        }
     }
 
     public ArrayList<Author> getAuthorsByBookId(int bookId){
@@ -30,58 +59,58 @@ public class BookService {
     }
 
     public ArrayList<Book> getBooksByTitle(String searchTerm){
-        return bookRepository.getBooksByTitle(searchTerm);
+        var books = bookRepository.getBooksByTitle(searchTerm);
+        matchWithAuthorsCategories(books);
+        return books;
     }
 
     public ArrayList<Book> getAvailableBooks(){
-        ArrayList<Book> books = bookRepository.getAllBooks();
+        return new ArrayList<>(getAllBooks().stream()
+                .filter(Book::isAvailable)
+                .toList());
+/*        ArrayList<Book> books = getAllBooks();
         ArrayList<Book> availableBooks = new ArrayList<>();
         for(Book book: books) {
             if(book.getAvailableCopies()>0){
                 availableBooks.add(book);
             }
         }
-        return availableBooks;
+        return availableBooks;*/
     }
 
-    public void fillWithAuthorsAndCategories (Book book) {
-        book.setAuthors(getAuthorsByBookId(book.getBookId()));
-        book.setCategories(getCategoriesByBookId(book.getBookId()));
-    }
-
-    public void fillListWithAuthorsAndCategories (ArrayList<Book> books) {
-        for (Book book : books){
-            fillWithAuthorsAndCategories(book);
-        }
-    }
 
     public boolean exists(int bookId) {
         return bookRepository.exists(bookId);
     }
 
     public ArrayList<Book> getBooksByAuthorId(int authorId) {
-        ArrayList<Book> bookList = bookRepository.getBooksByAuthorId(authorId);
-        return bookList;
+        ArrayList<Book> books = bookRepository.getBooksByAuthorId(authorId);
+        matchWithAuthorsCategories(books);
+        return books;
     }
 
     public ArrayList<Book> getBooksByAuthorName(String searchTerm) {
-        ArrayList<Book> bookList = bookRepository.getBooksByAuthorName(searchTerm);
-        return bookList;
+        ArrayList<Book> books = bookRepository.getBooksByAuthorName(searchTerm);
+        matchWithAuthorsCategories(books);
+        return books;
     }
 
     public ArrayList<Book> getBooksByCategoryId(int categoryId) {
-        ArrayList<Book> bookList = bookRepository.getBooksByCategoryId(categoryId);
-        return bookList;
+        ArrayList<Book> books = bookRepository.getBooksByCategoryId(categoryId);
+        matchWithAuthorsCategories(books);
+        return books;
     }
 
     public ArrayList<Book> getBooksByCategory(String searchTerm) {
-        ArrayList<Book> bookList = bookRepository.getBooksByCategory(searchTerm);
-        return bookList;
+        ArrayList<Book> books = bookRepository.getBooksByCategory(searchTerm);
+        matchWithAuthorsCategories(books);
+        return books;
     }
 
     public ArrayList<Book> getBooksByKeyword(String searchTerm) {
-        ArrayList<Book> bookList = bookRepository.getBooksByKeyword(searchTerm);
-        return bookList;
+        ArrayList<Book> books = bookRepository.getBooksByKeyword(searchTerm);
+        matchWithAuthorsCategories(books);
+        return books;
     }
 
     public void remove (Book book) {

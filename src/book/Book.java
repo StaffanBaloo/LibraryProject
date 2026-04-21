@@ -222,4 +222,8 @@ public class Book {
         this.language = language;
     }
 
+    public boolean isAvailable(){
+        return (availableCopies>0);
+    }
+
 }
