@@ -5,6 +5,8 @@ import exceptions.LoanRenewException;
 import exceptions.LoanReturnException;
 import fine.FineService;
 import member.Member;
+import member.MemberService;
+import note.NoteService;
 import prime.Rules;
 import prime.Main;
 
@@ -13,6 +15,7 @@ import java.time.DayOfWeek.*;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -107,6 +110,36 @@ public class LoanService {
             throw(new CantCreateLoanException("Medlemsstatus är " + member.getStatus() +"."));
         }
         return loan;
+    }
+
+    public HashMap<String, Integer> runMaintenance(){
+        NoteService noteService = new NoteService();
+        MemberService memberService = new MemberService();
+        int suspensions =0;
+        int overdue =0;
+        int reminders = 0;
+        ArrayList<Loan> loans =getAllCurrentLoans();
+        HashMap<String, Integer> results = new HashMap<>();
+        for (Loan loan : loans) {
+            if(loan.getDueDate().isBefore(Rules.suspensionDateByMembershipType(loan.getMember().getMembershipType()))) {
+                if(loan.getMember().getStatus().equalsIgnoreCase("active")) {
+                    noteService.sendNote(loan.getMember(), loan, "account_suspended");
+                    loan.getMember().setStatus("suspended");
+                    memberService.save(loan.getMember());
+                    suspensions++;
+                }
+            } else if (loan.getDueDate().isBefore(LocalDate.now())) {
+                noteService.sendNote(loan.getMember(), loan, "overdue_warning");
+                overdue++;
+            } else if (loan.getDueDate().isAfter(LocalDate.now().minusDays(8))) {
+                noteService.sendNote(loan.getMember(), loan, "loan_reminder");
+                reminders++;
+            }
+        }
+        results.put("suspensions", suspensions);
+        results.put("overdue", overdue);
+        results.put("reminders", reminders);
+        return results;
     }
 
     public int calculateFine(Loan loan){

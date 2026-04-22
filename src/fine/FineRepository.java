@@ -24,8 +24,11 @@ public class FineRepository extends Repository {
             stmt.setDate(3, Date.valueOf(LocalDate.now()));
             stmt.setString(4, "pending");
             int rowsAffected = stmt.executeUpdate();
+            ResultSet rs = stmt.getResultSet();
             if (rowsAffected == 0){
                 throw (new FineCreationException ("Could not create fine for loan " + fine.getLoan().getId()));
+            } else {
+                fine.setId(rs.getInt(1));
             }
         } catch (SQLException e) {
             System.out.println("Fel: " + e.getMessage());

@@ -11,6 +11,7 @@ import member.MemberService;
 import note.NoteService;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class LibrarianController {
@@ -61,26 +62,10 @@ public class LibrarianController {
     }
     public void runMaintenance(){
         LoanService loanService = new LoanService();
-        NoteService noteService = new NoteService();
-        MemberService memberService = new MemberService();
-        ArrayList<Loan> loans =loanService.getAllCurrentLoans();
-        int suspensions =0;
-        int reminders = 0;
-        int overdue = 0;
-        for (Loan loan : loans) {
-            if(loan.getDueDate().isBefore(Rules.suspensionDateByMembershipType(loan.getMember().getMembershipType()))) {
-                noteService.sendNote(loan.getMember(), loan, "account_suspended");
-                loan.getMember().setStatus("suspended");
-                memberService.save(loan.getMember());
-                suspensions++;
-            } else if (loan.getDueDate().isBefore(LocalDate.now())) {
-                noteService.sendNote(loan.getMember(), loan, "overdue_warning");
-                overdue++;
-            } else if (loan.getDueDate().isAfter(LocalDate.now().minusDays(8))) {
-                noteService.sendNote(loan.getMember(), loan, "loan_reminder");
-                reminders++;
-            }
-        }
+        HashMap<String, Integer> results = loanService.runMaintenance();
+        int suspensions = results.get("suspensions");
+        int reminders = results.get("reminders");
+        int overdue = results.get("overdue");
         System.out.println("Skickade "+suspensions+" avstängningar, "+overdue+" förfallovarningar, och "+reminders+" påminnelser.");
 
     }

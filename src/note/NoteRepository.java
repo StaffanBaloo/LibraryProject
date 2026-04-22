@@ -93,7 +93,7 @@ public class NoteRepository extends Repository {
              PreparedStatement stmt = conn.prepareStatement("""
                 INSERT INTO notifications
                     (member_id, loan_id, type, message, sent_date, is_read)
-                    VALUES (?, ?, ?, ?, ?, ?)""")) {
+                    VALUES (?, ?, ?, ?, ?, ?)""", Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, note.getMember().getMemberId());
             stmt.setInt(2, note.getLoan().getId());
             stmt.setString(3, note.getType());
