@@ -30,9 +30,12 @@ public class MainController {
                     guestController.showMenu();
                 }
                 case 2 -> {
-                    login();
-                    UserController userController = new UserController();
-                    userController.showMenu();
+                    if(login()) {
+                        UserController userController = new UserController();
+                        userController.showMenu();
+                    } else {
+                        System.out.println("Inloggning misslyckades.");
+                    }
                 }
                 case 3 ->{
                     LibrarianController librarianController = new LibrarianController();
@@ -44,9 +47,9 @@ public class MainController {
         }
     }
 
-    public void login(){
+    public boolean login(){
         boolean active = true;
-        Optional<Member> maybeUser;
+        Optional<Member> maybeUser = Optional.empty();
         MemberService memberService = new MemberService();
         EmailValidator emailValidator = EmailValidator.getInstance();
         while(active){
@@ -71,5 +74,6 @@ public class MainController {
                 System.out.println("Ogiltig ID eller e-postadress.");
             }
         }
+        return maybeUser.isPresent();
     }
 }
