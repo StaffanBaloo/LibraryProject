@@ -25,8 +25,8 @@ public class FineService {
         return fineRepository.getAllUnpaidFinesForMember(member);
     }
 
-    public int getUnpaidFinesTotalByMemberId(int memberId) {
-        return fineRepository.getUnpaidFinesTotalByMemberId(memberId);
+    public int getUnpaidFinesTotalByMemberId(Member member) {
+        return fineRepository.getUnpaidFinesTotalByMemberId(member);
     }
 
     public boolean exists(int id) {

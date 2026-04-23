@@ -24,7 +24,7 @@ public class FineRepository extends Repository {
             stmt.setDate(3, Date.valueOf(LocalDate.now()));
             stmt.setString(4, "pending");
             int rowsAffected = stmt.executeUpdate();
-            ResultSet rs = stmt.getResultSet();
+            ResultSet rs = stmt.getGeneratedKeys();
             if (rowsAffected == 0){
                 throw (new FineCreationException ("Could not create fine for loan " + fine.getLoan().getId()));
             } else {
@@ -147,7 +147,7 @@ public class FineRepository extends Repository {
         return fines;
     }
 
-    public int getUnpaidFinesTotalByMemberId(int memberId) {
+    public int getUnpaidFinesTotalByMemberId(Member member) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement("""
                 SELECT SUM(amount) AS total_fines
@@ -155,7 +155,7 @@ public class FineRepository extends Repository {
                 JOIN loans on loan_id = loans.id
                 WHERE loans.member_id = ? AND status = 'pending';
                 """)) {
-            stmt.setInt(1,memberId);
+            stmt.setInt(1,member.getMemberId());
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
                 return rs.getInt("total_fines");

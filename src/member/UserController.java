@@ -36,7 +36,7 @@ public class UserController {
                     System.out.println("Du har inga olästa meddelanden.");
                 }
 
-                totalFines = fineService.getUnpaidFinesTotalByMemberId(Main.loggedInUser.getMemberId());
+                totalFines = fineService.getUnpaidFinesTotalByMemberId(Main.loggedInUser);
                 if (totalFines > 0) {
                     System.out.println("Du har " + totalFines + " kr i obetalda böter.");
                 }

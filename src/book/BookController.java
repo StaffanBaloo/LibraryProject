@@ -214,7 +214,9 @@ public class BookController {
         if(maybeBook.isPresent()){
             Book book = maybeBook.get();
             try {
-                loanService.createLoan(book, Main.loggedInUser);
+                Loan loan = loanService.createLoan(book, Main.loggedInUser);
+                System.out.println("Du har lånat bok "+ book.getBookId() + ": " + book.getTitle()+".");
+                System.out.println("Förfallodatum är:" + loan.getDueDate()+".");
             }
             catch (CantCreateLoanException e) {
                 System.out.println("Du kan inte låna bok "+ bookId + ".");

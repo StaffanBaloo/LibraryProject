@@ -179,6 +179,8 @@ public class LoanController {
             for(Loan loan : loans){
                 try{
                     loanService.renewLoan(loan);
+                    System.out.println("Du har förnyat lån" + loan.getId() + " av " + loan.getBook().getTitle() + ".");
+                    System.out.println("Det nya förfallodatumet är " + loan.getDueDate() + ".");
                 }
                 catch (LoanRenewException e){
                     System.out.println("Kunde inte förnya lån " + loan.getId() + " av " + loan.getBook().getTitle() + ".");

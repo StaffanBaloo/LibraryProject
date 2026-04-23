@@ -39,6 +39,26 @@ public class NoteRepository extends Repository {
         return note;
     }
 
+    public ArrayList<Note> getAllNotes() {
+        ArrayList<Note> notes = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement("""
+                SELECT *, m.*, l.*,b.*
+                FROM notifications n
+                JOIN members m on n.member_id = m.id
+                JOIN loans l on n.loan_id = l.id
+                JOIN books b on l.book_id = b.id;""")) {
+            ResultSet rs =stmt.executeQuery();
+            while(rs.next()){
+                notes.add(mapRow(rs));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Fel: " + e.getMessage());
+        }
+        return notes;
+    }
+
     public ArrayList<Note> getNotesByMember(Member member) {
         ArrayList<Note> notes = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);

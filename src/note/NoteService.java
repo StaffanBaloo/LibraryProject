@@ -34,6 +34,10 @@ public class NoteService {
         noteRepository.markUnread(note);
     }
 
+    public ArrayList<Note> getAllNotes(){
+        return noteRepository.getAllNotes();
+    }
+
     public Note getNote(int noteId){
         return noteRepository.getNoteById(noteId);
     }

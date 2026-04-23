@@ -6,6 +6,8 @@ import exceptions.LoanReturnException;
 import fine.FineService;
 import member.Member;
 import member.MemberService;
+import note.NoteReminderDTO;
+import note.NoteReminderDTOService;
 import note.NoteService;
 import prime.Rules;
 import prime.Main;
@@ -115,25 +117,51 @@ public class LoanService {
     public HashMap<String, Integer> runMaintenance(){
         NoteService noteService = new NoteService();
         MemberService memberService = new MemberService();
+        NoteReminderDTOService noteReminderDTOService = new NoteReminderDTOService();
         int suspensions =0;
         int overdue =0;
         int reminders = 0;
         ArrayList<Loan> loans =getAllCurrentLoans();
         HashMap<String, Integer> results = new HashMap<>();
+        ArrayList<NoteReminderDTO> noteDTOs = noteReminderDTOService.getAllNoteReminderDTOs();
+        //Create three lists consisting of all the noteDTOs sent for suspensions, overdue warnings, and loan reminders respectively.
+        ArrayList<NoteReminderDTO> suspendedNotes = noteDTOs.stream()
+                .filter(noteReminderDTO -> noteReminderDTO.getType().equalsIgnoreCase("account_suspended"))
+                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<NoteReminderDTO> overdueNotes = noteDTOs.stream()
+                .filter(noteReminderDTO -> noteReminderDTO.getType().equalsIgnoreCase("overdue_warning"))
+                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<NoteReminderDTO> reminderNotes = noteDTOs.stream()
+                .filter(noteReminderDTO -> noteReminderDTO.getType().equalsIgnoreCase("loan_reminder"))
+                .collect(Collectors.toCollection(ArrayList::new));
+
         for (Loan loan : loans) {
+            // First, check to see if the loan is old enough to require suspension.
             if(loan.getDueDate().isBefore(Rules.suspensionDateByMembershipType(loan.getMember().getMembershipType()))) {
+                //only suspend active accounts, not ones already suspended or expired.
                 if(loan.getMember().getStatus().equalsIgnoreCase("active")) {
-                    noteService.sendNote(loan.getMember(), loan, "account_suspended");
-                    loan.getMember().setStatus("suspended");
-                    memberService.save(loan.getMember());
-                    suspensions++;
+                    //Send a suspension note and suspend the account unless that's already been done.
+                    if(!checkLoanAgainstNoteReminderList(loan, suspendedNotes)) {
+                        noteService.sendNote(loan.getMember(), loan, "account_suspended");
+                        loan.getMember().setStatus("suspended");
+                        memberService.save(loan.getMember());
+                        suspensions++;
+                    }
                 }
+            // If not old enough for suspension but still overdue.
             } else if (loan.getDueDate().isBefore(LocalDate.now())) {
-                noteService.sendNote(loan.getMember(), loan, "overdue_warning");
-                overdue++;
-            } else if (loan.getDueDate().isAfter(LocalDate.now().minusDays(8))) {
-                noteService.sendNote(loan.getMember(), loan, "loan_reminder");
-                reminders++;
+                //Same as above but with overdue warnings.
+                if(!checkLoanAgainstNoteReminderList(loan, overdueNotes)) {
+                    noteService.sendNote(loan.getMember(), loan, "overdue_warning");
+                    overdue++;
+                }
+            // Finally, check if the loan has a week or less left on it.
+            } else if (loan.getDueDate().isBefore(LocalDate.now().plusDays(8))) {
+                //And again with reminders that the loan is about to be up.
+                if(!checkLoanAgainstNoteReminderList(loan,reminderNotes)) {
+                    noteService.sendNote(loan.getMember(), loan, "loan_reminder");
+                    reminders++;
+                }
             }
         }
         results.put("suspensions", suspensions);
@@ -158,5 +186,13 @@ public class LoanService {
     public LocalDate newDueDate(){
         LocalDate firstMonday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         return firstMonday.plusWeeks(Rules.weeksByMembershipType(Main.loggedInUser.getMembershipType()));
+    }
+
+    public boolean checkLoanAgainstNoteReminderList(Loan loan, ArrayList<NoteReminderDTO> noteReminderDTOS) {
+        //Checks to see if any of the noteDTOs in list are related to the loan. If so return true, if not false.
+        ArrayList<NoteReminderDTO> testList = noteReminderDTOS.stream()
+                .filter(noteReminderDTO -> noteReminderDTO.getLoanId()==loan.getId())
+                .collect(Collectors.toCollection(ArrayList::new));
+        return !testList.isEmpty();
     }
 }

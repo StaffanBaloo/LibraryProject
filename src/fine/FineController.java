@@ -44,25 +44,27 @@ public class FineController {
 
     public void payFine(Member member) {
         boolean active = true;
-        while(active) {
-            System.out.println("Vänligen ange bot-ID (eller 0 för att gå tillbaka):");
-            int id = IO.inputNumber();
-            if(id==0) {
-                active = false;
-            } else {
-                Optional<Fine> maybeFine = fineService.getFineById(id);
-                if(maybeFine.isPresent()) {
-                    Fine fine = maybeFine.get();
-                    if (member.getMemberId() == fine.getLoan().getMember().getMemberId()) {
-                        fineService.payFine(fine);
-                        active = false;
-                    } else {
-                        System.out.println("Den boten hör inte till ett av dina lån.");
-                    }
+        if (fineService.getUnpaidFinesTotalByMemberId(member)>0) {
+            while (active) {
+                System.out.println("Vänligen ange bot-ID (eller 0 för att gå tillbaka):");
+                int id = IO.inputNumber();
+                if (id == 0) {
+                    active = false;
                 } else {
-                    System.out.println("Det finns ingen bot med ID "+id+".");
+                    Optional<Fine> maybeFine = fineService.getFineById(id);
+                    if (maybeFine.isPresent()) {
+                        Fine fine = maybeFine.get();
+                        if (member.getMemberId() == fine.getLoan().getMember().getMemberId()) {
+                            fineService.payFine(fine);
+                            active = false;
+                        } else {
+                            System.out.println("Den boten hör inte till ett av dina lån.");
+                        }
+                    } else {
+                        System.out.println("Det finns ingen bot med ID " + id + ".");
+                    }
                 }
             }
-        }
+        } else System.out.println("Du har inga obetalda lån.");
     }
 }
